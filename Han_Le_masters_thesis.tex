@@ -191,8 +191,10 @@
 %% Add here the packges you need
 %%
 \usepackage{graphicx}
-
-
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{xspace}
+\usepackage{booktabs}
 %% For tables that span multiple pages; used to split a paraphrasing example in
 %% the appendix. If you don't need it, remove it.
 \usepackage{longtable}
@@ -203,6 +205,54 @@
 \usepackage[type={CC}, modifier={by-nc-sa}, version={4.0}]{doclicense}
 %% Find below three examples for typesetting the CC license notice.
 
+% Use listings package to insert code block. Also define code block style.
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Code Block}
+% For color
+\usepackage{xcolor}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{gray!10},
+    commentstyle=\color{green!50!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{blue},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single
+}
+
+\lstdefinelanguage{json}{
+    basicstyle=\ttfamily\footnotesize,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    literate=
+     *{0}{{{\color{blue}0}}}{1}
+      {1}{{{\color{blue}1}}}{1}
+      {2}{{{\color{blue}2}}}{1}
+      {3}{{{\color{blue}3}}}{1}
+      {4}{{{\color{blue}4}}}{1}
+      {5}{{{\color{blue}5}}}{1}
+      {6}{{{\color{blue}6}}}{1}
+      {7}{{{\color{blue}7}}}{1}
+      {8}{{{\color{blue}8}}}{1}
+      {9}{{{\color{blue}9}}}{1}
+      {:}{{{\color{black}{:}}}}{1}
+      {,}{{{\color{black}{,}}}}{1}
+      {\{}{{{\color{blue}{\{}}}}{1}
+      {\}}{{{\color{blue}{\}}}}}{1}
+      {[}{{{\color{blue}{[}}}}{1}
+      {]}{{{\color{blue}{]}}}}{1},
+}
+
+\lstset{style=mystyle}
 
 %% Edit to conform to your degree programme
 %% Capitalise the words in the name of the degree programme: it's a name
@@ -239,7 +289,7 @@
 %%   is part of the metadata in the pdf/a file, and the metadata cannot contain
 %%   linebreaks.
 %%
-\thesistitle{Model Context Protocol Integration Framework for GenAI System of University}
+\thesistitle{UniMCP: A Standardized Model Context Protocol Integration Framework for  GenAI Production System in University}
 %\thesistitle[Title of the thesis]{Title of\\ the thesis}
 %%
 %% Either remove or leave \thesissubtitle{} empty if you don't use it
@@ -292,8 +342,11 @@
 \uselogo{aalto!}
 %\uselogo{aalto'}
 %\uselogo{}
-%%
-
+% Preamble to the framework name
+\newcommand{\UniMCP}{\textbf{UniMCP}\xspace}
+\newcommand{\aitutor}{\text{AI Tutor}\xspace}
+\newcommand{\aaltoai}{\text{Aalto AI Assistant}\xspace}
+\newcommand{\aalto}{\text{Aalto University}\xspace}
 %%%%%%%%%%%%%%%%%%               COPYRIGHT TEXT               %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -377,7 +430,7 @@
 %%
 \keywords{For keywords choose concepts that are central to your 
 thesis. Keywords are written in lowercase with the exception of certain
-abbreviations and proper nouns. E.g.\spc resistor\spc resistance\spc temperature}
+abbreviations and proper nouns. E.g.\spc artificial intelligence\spc generative artificial intelligence\spc large language model}
 %%
 
 %% The abstract text. This text in one paragraph is included in the metadata of
@@ -535,95 +588,903 @@ LLM         & Large Language Model \\
 
 %% Text body begins.
 %%
+% ============================================================
 \section{Introduction}
-\label{sec:intro}
-
+\label{chap:intro}
+% ============================================================
 %% Leave page number of the first page empty
 %% 
 \thispagestyle{empty}
 
-% background of the GenAI and MCP, what similar work others have already done, as well as an overview of the study
-The emergence of Gen AI tools in recent year has accelerated a new paradigm of interactive and tailored AI agents that focus on a specific, tailored application. 
+Large language models (LLMs) are rapidly integrated into production systems and connected to external tools, data sources, and services. 
+This adoption has brought about the new paradigm of agentic systems—these modern autonomous software systems utilize LLMs and other machine learning algorithms to perceive the user's prompt, decide on the best approach, take actions using available tools, and learn from the results.
+This paradigm shift of AI's capabilities from passive text generation to active tool use demands a robust, standardized framework in how AI is deployed and how to control AI's communication with external resources securely.
 
-The Model Context Protocol (MCP) is an open standard introduced by Anthropic in November 2024 that standardize how AI assistants are securely connected with external systems, such as tools, services, and data sources.
+As a result, the Model Context Protocol (MCP), introduced by Anthropic in November 2024, has emerged as a middleware layer that standardizes how AI agents connect with external systems and interact with the world beyond the training data of their LLMs \cite{anthropic_mcp_intro}.
+MCP introduces an interface through which LLMs can find, invoke, and interact with external tools, databases, and APIs through a unified communication layer based on the JSON-RPC protocol \cite{hou2025landscape}.
+From the point of view of scalability, MCP aims to solve the bottleneck of the \textit{N$\times$M integration problem}, which occurs when there are \textit{M} number of AI models that need to connect to \textit{N} external tools or data sources \cite{ray2025survey}. 
+Without MCP, each model requires a bespoke integration for each external tool or data source that it interacts with, turning this into the \textit{N$\times$M integration problem}. 
+Thanks to MCP, the AI model's reasoning is separated from tool execution, which enables a robust, scalable architecture in which new tools can be added without modifying the underlying agentic pipeline. 
+As a result, MCP are rapidly adopted by industry vendors within months of its release, including Google, GitHub, and Figma.
+For example, Google Calendar has offered an MCP server that allows AI agents to access Google Calendar data and acts as a customized AI assistant to check availability or create and update events \cite{google_calendar_mcp}.
+GitHub MCP server allows AI assistants to perform common GitHub operations such as read code repositories, manage issues and pull requests, and retrieve file contents \cite{github-mcp-server}.
+By June 2026, the MCP ecosystem is estimated to have grown to over 17,000 MCP servers, ranging from community-developed to enterprise-grade MCP servers \cite{glama_mcp_servers_2026}. 
 
+% problems
+However, at the same time, this rapid adoption of MCP has exposed critical gaps in the security and infrastructure to connect AI agents to external resources. 
+Currently, MCP provides only minimal built-in security guaranties by enforcing basic JSON schema validation and request traceability.
+It does not offer native support for authentication or confidentiality; therefore, the burden of securing tool interactions falls largely on individual developers \cite{yan2025mcpmisuse}. 
+This has led to multiple cybersecurity threats, including malicious prompt injection and MCP servers, cryptographic misuse, and insufficient access control mechanisms in the MCP ecosystem. 
+Furthermore, deploying MCP at organizational scale introduces additional challenges in scalability, multi-tenancy, and trust. 
+This issue is especially critical in the production systems of higher education institutions such as universities, where sensitive personal data, identity-bound services, and critical workflows are involved. 
 
 % research questions and the sub-problems in the line of inquiry
-This master’s thesis focuses on answering three main research questions: 
-(1) How to securely integrate MCP into a GenAI production system for university use?; 
-(2) How to scalable MCP framework in a GenAI production system of a university?; and
-(3) Is it possible to evaluate the trustworthiness of such an MCP agent in a university's GenAI system?
+The thesis addresses the research gap by proposing an MCP integration framework for GenAI systems in university contexts.
+The framework is developed and validated through a case for Aalto AI Assistant \cite{aalto_ai_assistant}, a chat-based assistant tool for internal users at Aalto University based in Espoo, Finland.
+Specifically, we integrate into Aalto AI Assistant's production system a service called AI Tutor.
 
-% the scope and constraints of the study along with the main concepts involved.
-As a case study, the MCP Integration Framework is developed and implemented for Aalto AI Assistant, a GenAI-based assistant tool for internal users at Aalto University, based in Espoo, Finland.%goals of the study
-The goals of the master's thesis is to answer the aforementioned research questions by developing an MCP agent for Aalto AI Assistant, focusing on cybersecurity, scalability, and trustworthiness.
+This thesis is carried out as a project at Aalto University IT Services (Aalto ITS), and Aalto AI Assistant serves as the primary case study, providing a real production environment in which to design, implement, and evaluate the proposed \UniMCP, an MCP Integration Framework.
+
+The thesis focuses on answering two main research questions: 
+\begin{enumerate}
+    \item How can MCP be securely integrated into a GenAI production system for university use?
+    \item How can a scalable MCP framework be designed and implemented within a university's GenAI production system?
+    %\item Is it possible to evaluate the trustworthiness of an MCP agent operating within a university's GenAI system?
+\end{enumerate}
+
+% the scope and constraints of the study along with the goals and main concepts involved.
+To answer these questions, this thesis studies the MCP architecture, identifies security and scalability challenges associated with MCP-based integration, and designs an MCP integration framework for university contexts. 
+The main contribution of the thesis is \UniMCP, a practical framework for integrating MCP into GenAI production systems in university environments. 
+The framework is named \UniMCP as the thesis project is conducted at Aalto University IT Services, and its design is motivated by the systems, environment, and use cases of Aalto University. 
+The framework is developed and evaluated through a case study of Aalto AI Assistant \cite{aalto_ai_assistant}, a GenAI-based assistant tool for internal users at Aalto University in Espoo, Finland. 
+
+As a proof of concept, the \UniMCP is validated through the development of \aitutor, a student-facing AI agent embedded in Aalto AI Assistant, to validate the proposed framework in a concrete university use case. The evaluation focuses on integration security, scalability, and trustworthiness, corresponding to the three research questions. More broadly, the thesis provides lessons for universities seeking to adopt tool-using GenAI assistants while maintaining security, scalability, privacy, and reliability.
+
+% What each chapter in the thesis is about
 
 
 %% In a thesis, every section/chapter starts a new page, hence the \clearpage
+
 \clearpage
+% ============================================================
+\section{Background of MCP}
+\label{chap:mcp_background}
+% ============================================================
+% what this chapter is about
+This chapter studies the background, core architectural components, and workflow of Model Context Protocol (MCP). 
+In addition, current landscape of the MCP ecosystem is analyzed by studying MCP adoption and use cases relevant to the field of higher education.
 
-\section{MCP Architecture}
+\subsection{Overview of Model Context Protocol}
+% Explain what MCP is.
+It is important to first understand the big picture of Model Context Protocol (MCP).
+Introduced by Anthropic in November 2024, MCP is an open-source standard that defines how an AI application exchanges context with external tools and data sources through a uniform interface, rather than through bespoke, tool-specific integration code \cite{anthropic_mcp_intro}.
+% Why it was introduced
+Hence, MCP can reduce custom code for every AI-to-data connection and solve the \textit{N$\times$M integration problem} \cite{ray2025survey}. 
 
-\subsection{Base Protocol of MCP}
-The core of MCP is JSON-RPC 2.0, a stateless Remote Procedure Call that enables structured communication between client and server using JSON.
+MCP follows a host-client-server architecture illustrated in Fig. \ref{fig:mcp_architecture} \cite{mcp_architecture}. 
+A host is an AI application, such as Claude Desktop, that embeds one or more MCP clients.
+Each MCP client maintains a connection to a single MCP server and uses contexts and capabilities from that MCP server. 
+Contexts are the stream of information that flows into the language model via the server, such as external data or files. 
+Capabilities are the features a server declares to the client that it can provide during connection setup, such as writing a file or running a query.
+In-depth details of three key participants in MCP—host, client, and server—are discussed further in Section \ref{sec:mcp_components}.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/mcp_architecture.png}
+    \caption{MCP architecture adopts a host-client-server pattern where each host can run several clients. Remote MCP servers use Streamable HTTP transport and serve many clients simultaneously, while local MCP servers use the STDIO (Standard Input/Output) transport on a local machine and typically serve one client. The figure is adapted from the official MCP documentation \cite{mcp_architecture}.}
+    \label{fig:mcp_architecture}
+\end{figure}
+
+An important concept in MCP is primitives. 
+They are the fundamental building blocks for adding contexts to the language model and enrich interactions between client, server, and language model. 
+MCP specification defines three primitives that a server can expose to a client as follow: 
+\begin{enumerate}
+    \item Tools: Tools are functions that the LLM can invoke to take action, for example, API calls, database queries, and information search. 
+    \item Resources: Resources are data that inject contextual data into the model such as API responses, databases, and file contents. 
+    \item Prompts: Prompts are reusable instructions that standardize how users and clients interact with the LLMs.
+\end{enumerate}
+
+According to the official documentation of MCP \cite{mcp_architecture}, it has two layers: (1) a data layer that implements the JSON-RPC 2.0 based exchange protocol, lifecycle management, and the server and client features described above, 
+and (2) a transport layer that defines the connection-establishment, message-framing, and authorization mechanisms specific to each transport, such as STDIO or Streamable HTTP.
+Conceptually, the data layer is the inner layer, while the transport layer is the outer layer.
+This thesis focuses on the data layer of MCP, which is studied further in Section \ref{sec:data_layer}. 
+
+% ============================================================
 \subsection{MCP Core Components}
-
-The core components of an end-to-end MCP architecture are MCP host, MCP server, MCP client.
+\label{sec:mcp_components}
+% ============================================================
+This section studies the three key components of an end-to-end MCP architecture: host, client, and server.
 
 \subsubsection{MCP Host}
+In MCP architecture, MCP host is an AI application that the end user interacts with and coordinates and manages one or multiple MCP clients \cite{mcp_architecture}.
+Architecturally, the host acts as the container and coordinator for all MCP
+activity within the application: it creates and manages client instances,
+controls their connection permissions and lifecycle, enforces security policies
+and consent requirements, and handles user authorization
+decisions~\cite{mcpspec2026}.
+Because a single host can connect to multiple MCP servers simultaneously, it is
+also responsible for aggregating the tool, resource, and prompt catalogues
+exposed by all connected servers into a unified context presented to the
+underlying LLM.
+The host is therefore the component that decides what information is visible to
+the model and mediates between the model's requests to invoke tools and the
+policies governing which invocations are permitted.
+Examples of MCP hosts include chat-based GenAI applications such as Claude and ChatGPT, IDE-integrated assistants such as VS Code with GitHub Copilot and Cursor. 
+In the context of this thesis, the Aalto AI Assistant platform \cite{aalto_ai_assistant} acts as the MCP host for the \aitutor proof of concept described in Chapter \ref{chap:implementation}. 
+
+\subsubsection{MCP Client}
+\label{sec:mcp-client}
+The MCP client is embedded inside the MCP host and maintains the actual connection to a single MCP server. 
+The host instantiates one client for every server it connects to, so a host that uses three different MCP servers will maintain three separate, isolated client sessions. 
+
+At session initialization, the client performs the capability-negotiation handshake described in on the host's behalf, and for the remainder of the session it is the channel through which the host forwards tool invocations, resource requests, and prompt requests to the server, and through which the server's responses and notifications are relayed back to the host \cite{mcpclient2026}. 
+Because each client-server pair forms its own isolated session, permissions, policies, and protocol state negotiated with one server do not leak into a different client's session with a different server.
 
 \subsubsection{MCP Server}
-Local MCP Server
+\label{sec:mcp-server}
 
-Remote MCP Server
+An MCP server is a program that exposes capabilities---tools, resources, and
+prompts---to MCP clients through the standardized MCP primitives.
+Servers operate independently with focused responsibilities, and each server
+maintains its own capability set that is negotiated with the client during
+session initialization~\cite{mcpspec2026}.
+MCP servers can be deployed in two modes that differ substantially in their
+operational and security characteristics.
+
+\paragraph{Local MCP Server.}
+A local MCP server runs as a subprocess on the same machine as the host and
+communicates with its client exclusively through standard input and output (the
+STDIO transport)~\cite{mcpspec2026}.
+Because the server process is spawned and supervised by the host, its source
+code or binary is present on the user's machine and can in principle be
+inspected, version-pinned, or sandboxed by the operating system before
+execution.
+This makes local servers well suited for resources that are inherently local to
+the user's environment---a filesystem, a local Git repository, or an
+on-premises database---and they are the deployment mode adopted by most
+reference implementations published by the MCP project.
+Their primary limitation is scalability: a STDIO server maintains a
+one-to-one relationship with its client and serves a single user session at a
+time, making the local mode unsuitable for an organization-wide system serving
+many concurrent users simultaneously.
+
+\paragraph{Remote MCP Server.}
+A remote MCP server is hosted on infrastructure separate from the user's
+machine and communicates with the MCP client over a network connection, most
+commonly using the Streamable HTTP transport~\cite{mcpspec2026}.
+Streamable HTTP exposes the server through a single unified HTTP endpoint over
+which the client can send requests and receive both standard HTTP responses and
+streamed server notifications, enabling efficient bidirectional communication
+without requiring a persistent socket connection.
+Unlike a local server, a single remote MCP server can serve many clients
+concurrently---the deployment mode required for an organization-wide GenAI
+assistant serving many simultaneous users.
+This scalability advantage comes at the cost of introducing authentication,
+authorization, and multi-tenancy concerns that the base MCP specification
+delegates to server implementers, as discussed further in
+Chapter \ref{chap:challenges}.
 
 Remote MCP Server can be connected with Streamable HTTP. 
 This is a transport protocol used for the Model Context Protocol (MCP) that enables AI agents to communicate with remote services using a single, unified HTTP endpoint. 
 
-\subsubsection{MCP Client}
+% ============================================================
+\subsection{Data layer of MCP}
+\label{sec:data_layer}
+% ============================================================
+The foundation of MCP's data layer is JSON-RPC 2.0 \cite{jsonrpc2020}, a stateless Remote Procedure Call (RPC) that enables structured communication between client and server using JSON format.
+JSON-RPC is a JSON-based wire protocol for RPC \cite{jsonrpc2020}.
 
+On top of the underlying JSON-RPC 2.0 protocol, MCP incorporates a stateful session protocol. 
+The data layer protocol defines the ways developers can share context from MCP servers to MCP clients.
+MCP requires lifecycle management to negotiate the capabilities that both the client and server support before any tool, resource, or prompt can be used. 
+In the example in Code Block \ref{lst:mcp_example}, a session begins with an initialization handshake in which the client and server declare their protocol version and capabilities. for example, whether the server supports resource subscriptions or the client supports sampling.
+Only capabilities declared during this exchange may be used for the remainder of the session, and the session ends with an explicit termination step.
+ 
+\begin{lstlisting}[language=JSON, caption={Example MCP initialization in life cycle management. The code is adopted from MCP official documentation \cite{mcp}.}, label={lst:mcp_example}]
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "elicitation": {}
+    },
+    "clientInfo": {
+      "name": "example-client",
+      "version": "1.0.0"
+    }
+  }
+}
+\end{lstlisting}
+
+% How it supports tool-using AI systems.
+
+The separation between a data layer and a transport layer is what allows the same JSON-RPC semantics to run unchanged over a local subprocess pipe or a remote HTTPS endpoint, which is the distinction elaborated further in Section \ref{sec:mcp_workflow}.
+
+% ============================================================
 \subsection{MCP Workflow}
+\label{sec:mcp_workflow}
+% ============================================================
 
+An end-to-end MCP interaction proceeds through four sequential
+stages~\cite{mcpspec2026}.
 
-\subsection{Current Landscape of MCP}
-FastMCP’s OpenAPI converter has become one of the most popular tools for auto-generating MCP servers from REST APIs.
+In the \textbf{initialization} stage, the host creates a client and directs it
+to connect to the target server.
+The client sends an initialization request carrying its protocol version and
+supported capabilities; the server responds with its own protocol version and
+capabilities.
+Both parties must agree on a compatible protocol version before proceeding, and
+only capabilities declared during this handshake may be used for the remainder
+of the session.
 
-\subsection{Current Challenges of MCP}
+In the \textbf{discovery} stage, the client requests the catalogues of tools,
+resources, and prompts currently exposed by the server.
+The host incorporates the names, descriptions, and input schemas of these
+primitives into the context provided to the LLM, so the model can reason about
+which capabilities are available and how to invoke them.
+Only the declared interface of each primitive is visible to the model; the
+server's internal implementation is never exposed.
 
-\subsubsection{Security Vulnerabilities}
-Prompt injection is a major cybersecurity threat in LLM applications that allows attackers to hijack or manipulate agent's behavior.
-AI agent is prone to malicious instructions injected in user's input or external data sources such as documents and websites. 
+During the \textbf{operation} stage, a user- or model-initiated action causes
+the host to direct the client to send a request to the server---most commonly
+a tool invocation.
+The server executes the corresponding handler and returns a structured response;
+the client relays this response to the host, which integrates it into the
+conversation context and passes it to the LLM for further reasoning.
+This request-response loop may repeat any number of times within a single
+session.
+In addition to client-initiated requests, the server may independently push
+resource-update notifications to the client, and the server may initiate
+sampling requests that ask the host LLM to generate content, enabling
+bidirectional, dynamic interactions beyond the simple request-response pattern.
 
+The session concludes with a \textbf{termination} stage in which either party
+sends an explicit close notification and the underlying transport connection is
+released.
 
-Cryptographic misuses in MCP servers
+In the AI Tutor proof of concept (Chapter~\ref{chap:implementation}), a session
+initializes when a student opens AI Tutor inside Aalto AI Assistant; the
+operation stage carries the transcript-retrieval and course-recommendation tool
+calls described in Section~\ref{sec:aitutor-use-cases}; and the session
+terminates when the student closes the conversation.
 
-\subsubsection{Malicious MCP servers}
+\subsection{Current Ecosystem of MCP}
+%The emergence of Gen AI tools in recent year has accelerated a new paradigm of interactive and tailored AI agents that focus on a specific, tailored application. FastMCP’s OpenAPI converter has become one of the most popular tools for auto-generating MCP servers from REST APIs.
 
+\label{sec:mcp-ecosystem}
+Since the public release of MCP in November 2024, a large and rapidly growing ecosystem of tooling, server implementations, and client integrations has formed around the technology of MCP.
+On the tooling side, libraries such as FastMCP have substantially lowered the barrier to creating new MCP servers: FastMCP's OpenAPI converter \cite{fastmcp_openapi2026} can automatically generate a working MCP server from an existing REST API specification, so that organizations with established API infrastructure can expose their services to LLM agents without writing MCP-specific server
+code from scratch.
+MCP's official SDK support now spans multiple common programming languages, including TypeScript, Python, Java, and C\#, reflecting the protocol's uptake across diverse development ecosystems.
 
+On the adoption side, industry growth has been rapid.
+Major technology companies including Microsoft,
+Google, and Bloomberg have published accounts of MCP adoption for
+engineering and productivity workflows.
+Public server registries track the resulting expansion: the Glama AI registry,
+which indexes community-contributed and official servers, lists tens of thousands of MCP servers as of mid-2026 \cite{glama_mcp_servers_2026}, spanning
+categories from developer tools, databases, and filesystems to finance, browser automation, and research data.
 
-\subsubsection{Scaling Complexity}
-In addition, the immaturity of the MCP ecosystem adds up to the scaling challenges of MCP application.
+As organizations have moved from individual, ad hoc MCP connections toward managing many servers across teams, a \emph{gateway} pattern has emerged as
+a common architectural response: an MCP gateway sits as a reverse proxy between the AI host and the servers it uses, centralizing authentication,
+policy enforcement, and observability rather than distributing these concerns
+across every individual server.
+This pattern is directly relevant to the design of the AaltoMCP framework in
+Chapter~\ref{chap:design}, as it offers a concrete answer to the scalability
+and governance requirements the university context imposes.
+% ============================================================
+\section{Challenges of MCP and Research Gap}
+\label{chap:challenges}
+% ============================================================
 
+MCP has been adopted at significant scale since its introduction in November 2024, but its deployment in organizational, enterprise production environments has exposed a layered set of challenges.
+To reason precisely about these challenges, this chapter distinguishes three origins: (1) limitations inherent to the MCP specification itself (Section \ref{sec:proto-limits}), 
+(2) problems that have emerged in the current ecosystem of MCP implementations and registries (Section \ref{sec:ecosystem-challenges}), and 
+(3) requirements that arise specifically from adopting MCP in a university setting (Section \ref{sec:university-context}).
+This three-way distinction is essential in the thesis because each origin motivates a different category of design decisions in the \UniMCP framework: 
+protocol limitations identify controls that the framework must \emph{add} to what the spec provides; ecosystem challenges identify what the framework must \emph{guard against} at runtime; and
+university-context requirements identify the \emph{policies and standards} those controls must satisfy.
 
+% ------------------------------------------------------------
+\subsection{Protocol-Level Limitations}
+\label{sec:proto-limits}
+% ------------------------------------------------------------
 
+Protocol-level limitations are structural properties of the MCP specification as designed \cite{mcpspec2026}.
+They are not failures of any particular implementation; they are deliberate design choices that maximize
+flexibility at the cost of leaving specific security and multi-tenancy properties entirely to the
+developer \cite{hou2025landscape, yan2025mcpmisuse, narajala2025enterprise}.
 
+\textbf{No mandatory authentication or authorization.}
+The MCP specification recommends that remote MCP servers using the Streamable HTTP transport follow OAuth 2.1, but it does not mandate anny specific authentication mechanism and provides no authorization enforcement at the protocol layer \cite{mcpspec2026, mcp_authorization_2025}.
+Therefore, a server that omits authentication entirely is compliant with the MCP specification.
+This means the protocol itself cannot prevent an unauthenticated client from discovering and invoking
+a server's tools if the operator neglects to implement access controls.
+
+\textbf{No mandatory transport security.}
+The MCP specification does not rTLS for any transport variant~\cite{mcpspec2026}.
+Using Streamable HTTP over HTTPS is a convention rather than an enforced protocol property, and the
+specification provides no mechanism to negotiate or verify transport security between a client and a server.
+
+\textbf{Free-form tool descriptions.}
+MCP tool descriptions are arbitrary natural language strings with no structure, length limit, or semantic
+constraint imposed by the specification~\cite{mcpspec2026}.
+This is a deliberate flexibility decision, but it is also the structural property that makes tool poisoning
+attacks possible: since the LLM processes tool descriptions as part of its reasoning context, a maliciously authored description can redirect the model's behavior regardless of what the tool's code
+actually does~\cite{wang2026mcptox}.
+
+\textbf{No server vetting or registry governance.}
+The MCP specification does not have any default mechanism for verifying the provenance, integrity, or reliability of an MCP server before a client connects to it~\cite{mcpspec2026}.
+There is no concept of a verified publisher identity, a server certificate tied to an audited source, or a
+protocol-level revocation mechanism.
+Which MCP servers to trust is delegated entirely to the MCP host operator.
+
+\textbf{Single-tenant session model.}
+The MCP session model is designed around a stateful,
+one-to-one relationship between a single client and
+a single server~\cite{mcpspec2026}.
+The specification provides no built-in primitives for
+session namespacing, tenant isolation, or per-user
+context separation within a shared server instance.
+Multi-tenancy --- multiple authenticated users sharing
+the same server process --- must be implemented
+entirely outside the protocol layer.
+
+% ------------------------------------------------------------
+\subsection{Ecosystem-Level Challenges}
+\label{sec:ecosystem-challenges}
+% ------------------------------------------------------------
+
+Ecosystem-level challenges are problems that emerge not from the specification, but from the current state of
+how MCP systems are built, deployed, and maintained.
+They are empirically observable in deployed servers and would persist even if all operators were fully aware of the protocol-level limitations above.
+
+\textbf{Widespread security vulnerabilities in deployed servers.}
+Hasan et al.\ conducted a large-scale empirical evaluation of MCP server security across 1,899 open-source servers and found that 7.2\% contain at least one statically detectable security vulnerability \cite{hasan2025mcp}.
+%The most prevalent vulnerability pattern is credential exposure (affecting 3.6\% of servers), followed by lack of access control (1.4\%), CORS issues (1.2\%), and transport security weaknesses (0.7\%) \cite{hasan2026mcp_security}. 
+The most prevalent class is credential exposure---hardcoded API keys and passwords in source code, which affect 3.6\% of servers.
+Lack of access control affects 1.4\%, and transport security issues such as SSL verification bypasses affect 0.7\%.
+%The empirical research conducted by Hasan et al. on 1,899 open-source MCP servers shows that 7.2\% of them are affected by vulnerability patterns and 5.5\% of them suffer from MCP-specific tool poisoning. 
+
+\textbf{Tool poisoning in deployed servers.}
+The study conducted by Hasan et al.\ found that 5.5\% of analyzed MCP servers already exhibit tool poisoning, which involve malicious instructions embedded in tool descriptions that direct the LLM to perform unintended actions~\cite{hasan2025mcp}.
+%Tool poisoning in indirect prompt injection. Prompt injection is a major cybersecurity threat that allows attackers to hijack or manipulate agent's behavior. The attackers can input malicious instructions in their prompts or external data sources such as documents and websites. 
+The MCPTox benchmark confirmed that current LLM agents are broadly susceptible: success rates reached 72.8\%
+across 20 production models, with refusal rates below 3\%~\cite{wang2026mcptox}.
+
+\textbf{Post-deployment mutation attacks.}
+Park et al.\ documented a qualitatively different threat: the rug-pull pattern, in which a server that
+behaves correctly at installation time is later silently modified~\cite{park2026attack}.
+A real-world instance in September 2025 saw an unofficial Postmark MCP server with over 1,500 weekly
+downloads modified to exfiltrate outgoing emails, remaining undetected for several weeks.
+This threat is structurally enabled by the protocol's lack of server integrity guarantees (Section~\ref{sec:proto-limits}).
+
+\textbf{Cryptographic misuse.}
+Yan et al.\ applied MICRYSCOPE, the first static
+analysis framework targeting cryptographic misuse
+specifically in MCP servers, and found widespread
+ad hoc practices across deployed servers, including
+weak hash functions used for password storage and
+missing authentication~\cite{yan2025cryptography}.
+Because the specification imposes no cryptographic
+requirements, these practices arise from individual
+developer decisions without any protocol-level
+safety net.
+
+\textbf{Immature enterprise tooling.}
+Most reference and community MCP servers default to the
+STDIO transport, which imposes a one-process-per-session
+model unsuitable for concurrent organizational
+deployment~\cite{descope2025enterprise}.
+Enterprise-grade capabilities --- OAuth~2.1 compliance,
+SSO integration, centralized audit logging, and granular
+per-user permissions --- are absent from most server
+implementations and must be built independently by
+each operator~\cite{narajala2025enterprise}.
+
+\textbf{Unvetted public registries.}
+Public MCP registries list tens of thousands of servers contributed by anonymous or pseudonymous authors without
+systematic security review~\cite{glama_mcp_servers_2026}.
+Because integration between requires only a URL, a single compromised MCP server can affect a large population before
+any registry-level intervention.
+
+% ------------------------------------------------------------
+\subsection{University-Context Requirements}
+\label{sec:university-context}
+% ------------------------------------------------------------
+
+University-context requirements are constraints that
+arise from the specific regulatory, institutional, and
+operational environment of a higher education
+institution.
+They would need to be addressed even if the protocol-
+level limitations and ecosystem-level challenges above
+were fully resolved.
+
+\textbf{GDPR and data protection.}
+European universities are subject to the General Data
+Protection Regulation, which governs the collection,
+processing, storage, and transfer of personally
+identifiable data.
+Student academic records --- transcripts, enrollment
+history, grades --- constitute personal data under GDPR
+and are subject to the principles of data minimization,
+purpose limitation, and storage
+limitation~\cite{ng2025security}.
+A recent study of GenAI usage policies at universities
+across twelve countries found that GDPR was not designed
+with GenAI capabilities in mind and leaves clear gaps,
+for example around a model inferring sensitive student
+attributes from language patterns rather than from
+formal records~\cite{ng2025security}.
+
+\textbf{Institutional data classification.}
+Universities maintain their own data classification
+hierarchies beyond GDPR's legal categories.
+Aalto University classifies information as public,
+internal, confidential, or
+secret~\cite{aalto2026assistant}.
+Student transcripts are confidential; the course
+catalogue is internal.
+An MCP integration must enforce these tiers at the
+tool response layer so that confidential data is
+handled differently from internal or public data,
+and secret data is never processed by a GenAI system.
+
+\textbf{Institutional identity and SSO.}
+University services are identity-bound: access to a
+student's transcript is tied to that student's
+institutional identity, managed by the university's
+identity provider.
+For example, at Aalto University, this is Azure Active Directory
+via OIDC-based Single Sign-On~\cite{aalto_ai_assistant}.
+An MCP integration must integrate with the
+university's existing identity infrastructure and
+propagate the verified institutional identity through
+the tool call chain so that server-side data scoping
+can enforce ownership.
+
+\textbf{Multi-role user population.}
+A university's user population is not homogeneous.
+Students, teaching staff, administrative staff, and
+IT personnel hold meaningfully different access rights
+to institutional systems.
+An MCP integration must support role-based access
+control that reflects these distinctions, preventing,
+for example, a student from invoking a tool that an
+academic advisor could legitimately use to access
+any student's record.
+
+\textbf{Institutional audit accountability.}
+Universities are subject to governance requirements
+and potential regulatory audits beyond those of a
+typical consumer product.
+Access to student personal data must be logged in a
+tamper-evident, user-attributable form, retained for
+institutionally defined periods, and available for
+compliance reporting.
+This is a stricter requirement than general-purpose
+application logging.
+
+% ------------------------------------------------------------
+\subsection{Research Gap}
+\label{sec:research-gap}
+% ------------------------------------------------------------
+
+The three challenge layers identified in this chapter combine into a research gap.
+At the protocol level, MCP provides no authentication, no transport security requirement, no tool description constraints, no server vetting mechanism, and no multi-tenancy primitives \cite{mcpspec2026}.
+At the ecosystem level, deployed servers exhibit widespread credential exposure, tool poisoning, and
+post-deployment mutation, in registries that provide no systematic governance.
+At the university-context level, GDPR, institutional data classification, identity-bound SSO, multi-role
+access control, and audit accountability impose requirements that go beyond what the protocol and
+its current ecosystem provide.
+
+\textbf{No existing work addresses all three layers
+together in a university GenAI production context.}
+Table~\ref{tab:gap-analysis} positions the four most
+directly relevant prior works against the three
+challenge layers.
+
+\begin{table}[h]
+\centering
+\caption{Prior work coverage of the three challenge
+  layers}
+\label{tab:gap-analysis}
+\begin{tabular}{lccc}
+\hline
+\textbf{Prior work} &
+\textbf{Protocol} &
+\textbf{Ecosystem} &
+\textbf{University context} \\
+\hline
+Narajala \& Habler~\cite{narajala2025enterprise} &
+\checkmark & \checkmark & \texttimes \\
+Hasan et al.~\cite{hasan2025mcp} &
+\texttimes & \checkmark & \texttimes \\
+Ng et al.~\cite{ng2025security} &
+\texttimes & \texttimes & \checkmark \\
+Hou et al.~\cite{hou2025landscape} &
+\checkmark & \checkmark & \texttimes \\
+\textbf{\UniMCP (this thesis)} &
+\checkmark & \checkmark & \checkmark \\
+\hline
+\end{tabular}
+\end{table}
+
+Narajala and Habler~\cite{narajala2025enterprise}
+propose an enterprise-grade MCP security framework
+covering the protocol and ecosystem layers, but
+they do not address university-specific regulatory
+obligations, institutional identity infrastructure,
+or data classification requirements.
+Hasan et al. \cite{hasan2025mcp} characterize
+ecosystem-level vulnerabilities empirically but
+propose no integration framework.
+Ng et al.~\cite{ng2025security} establish the
+university-context requirements for GenAI systems
+but do not address MCP.
+Hou et al.~\cite{hou2025landscape} survey the MCP
+threat landscape but propose no concrete framework
+or implementation.
+
+This thesis fills the gap by proposing \textbf{\UniMCP}, a standardized MCP integration framework for GenAI
+production systems in university contexts, which simultaneously addresses all three layers:
+adding authentication, authorization, tool vetting,
+and multi-tenancy above the protocol layer;
+defending against ecosystem-level threats through
+runtime integrity verification and a vetted tool
+registry; and satisfying university-context
+requirements through GDPR-aware data handling, data classification enforcement, Azure AD
+integration, and institutional audit logging.
+The requirements that operationalize these objectives are derived in Chapter~\ref{chap:requirements}.
+
+ 
+Data exfiltration is another attack pattern where the attackers manipulate the model to reveal sensitive information. Cryptographic misuses in MCP servers are another issues emerged with the rise of MCP.
+
+\subsection{AI in University Contexts}
+
+% This subsection should bridge the background chapter to the \UniMCP framework.
+Universities process large volumes of sensitive personal data as a routine part of their operations, spanning study planning, course enrollment, transcripts, advising, and broader administrative workflows. 
+Therefore, GenAI assistants deployed inside a university need stricter governance and control than general-purpose chatbots.
+A single compromised data integration could expose private education records or student emails \cite{ng2025security}.
+
+For European universities as \aalto, the General Data Protection Regulation (GDPR) governs how any personally identifiable student data may be collected, processed, and retained, including data that surfaces temporarily in an LLM's context window during a tool-mediated interaction.
+A recent qualitative analysis of GenAI usage guidelines from universities across 43 universities across 12 countries \cite{ng2025security} finds that institutions broadly acknowledge privacy and security risks posed by GenAI, but that existing regulatory frameworks fall short of addressing GenAI-specific threats.
+For example, a model's capacity to infer sensitive personal attributes indirectly from a student's language patterns, without
+ever accessing a formal education record.
+This implies that governance of an university GenAI system requires controls that go beyond regulatory compliance alone.
+Therefore, the analysis recommends GenAI-specific risk assessment frameworks and technical safeguards tailored to academic contexts \cite{ng2025security}. 
+Beyond regulatory compliance, the growing student demand for accessible AI tools further motivates MCP adoption, since MCP can reduce development time and accelerate the deployment of new capabilities in GenAI systems. 
+However, this adoption requires governance, authentication, authorization, auditing, and privacy controls tailored to the university setting. 
+Hence, this thesis identifies a critical need for an MCP integration framework that focuses on security and scalability in university contexts.
 
 \clearpage
 
-\section{MCP for Aalto AI Assistant as a Proof of Concept}
-As a proof of concept for the MCP Integration Framework, the AI Tutor project is developed as a tailored AI tutor for students in Aalto AI Assistant.
+% ============================================================
+\section{Research Methodology and Requirements}
+\label{chap:requirements}
+% ============================================================
 
-\subsection{Aalto AI Assistant}
-Aalto AI Assistant is a chat-based application developed by the IT Services at Aalto University in Finland. Under the hood, it is powered by the same language models as ChatGPT, including GPT-5 and GPT-5.1. 
+\subsection{Research Questions}
 
-\subsection{AI Tutor as an MCP Application in Aalto AI Assistant}
+The challenges identified in Section \ref{chap:challenges} show that MCP leaves authentication,
+transport security, server vetting, and multi-tenancy unresolved at the protocol level, that these gaps are exploited in practice at the ecosystem level, and that university deployment adds regulatory and identity
+requirements on top. No existing framework addresses all three layers
+together for a university GenAI production system. This research gap motivates two
+research questions:
+ 
+\begin{itemize}
+    \item \textbf{RQ1.} How can MCP be securely integrated into a GenAI
+    production system for university use?
+    \item \textbf{RQ2.} How can a scalable MCP framework be designed and
+    implemented within a university's GenAI production system?
+\end{itemize}
+ 
+RQ1 concerns the enforcement of authentication, authorization, consent, and data-classification controls around MCP tool invocation. 
+RQ2 concerns whether new institutional tools and data sources can be integrated, and whether the resulting system can serve a growing user population, without redesigning the underlying agentic pipeline. 
+Both questions are answered through the design, implementation, and evaluation of a single artifact, \UniMCP, instantiated through the \aitutor proof of concept.
+
+% ·····················
+\subsection{Research Methodology}
+\label{sec:methodology}
+% ·····················
+This thesis follows the Design Science Research Methodology (DSRM) proposed by Peffers et al.~\cite{peffers2007design}, a six-step process for producing and evaluating a viable artifact -- here, a framework -- in
+response to an organizational problem~\cite{hevner2004}. 
+DSRM is used because the contribution of this thesis is not a theoretical model but a deployable integration framework whose value must be demonstrated in a real production environment. 
+The artifact of the thesis is \UniMCP, a standardized MCP integration framework for GenAI production systems in university contexts.
+\UniMCP  is developed in response to practical requirements identified in Aalto AI Assistant and evaluated through the development of AI Tutor proof of concept.
+Table~\ref{tab:dsrm-mapping} maps each DSRM step to  the corresponding chapter of this thesis.
+
+ 
+\begin{table}[h]
+\centering
+\caption{Mapping of the DSRM six-step process to thesis chapters}
+\label{tab:dsrm-mapping}
+\begin{tabular}{p{0.32\linewidth} p{0.55\linewidth}}
+\toprule
+DSRM step & Thesis chapter \\
+\midrule
+    1. Problem identification and motivation & Chapter~1 (Introduction),
+    Section~2.6 (Challenges of MCP and Research Gap) \\
+    2. Definition of objectives for a solution & Section~3.3 (Requirement
+    Derivation, this chapter) \\
+    3. Design and development & Chapter~5 (Design of \UniMCP) \\
+    4. Demonstration & Chapter~6 (Implementation of \UniMCP: AI Tutor
+    Application) \\
+    5. Evaluation & Chapter~7 (Evaluation and Results), Section~3.4 (this
+    chapter, evaluation approach) \\
+    6. Communication & This thesis document, to Aalto University IT
+    Services and submitted to Aaltodoc, the academic research community \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+The case study context (Aalto AI Assistant, Section \ref{sec:aalto-ai-assistant}) and the
+proof-of-concept use case (AI Tutor, Section \ref{sec:aitutor-use-cases}) operationalize Step~2 by
+grounding the abstract objectives of secure integration and scalability in a concrete organizational setting, rather than treating \UniMCP as a general-purpose framework evaluated in the abstract.
+
+ % what is design science research?
+This thesis follows the \emph{Design Science Research Methodology} (DSRM) proposed by Peffers et al. \cite{peffers2007design}, which standardizes design science research in information systems as a sequential, six-step process.
+DSRM is suitable when the research contribution is a viable artifact, e.g., a framework, model, or instantiation, designed to solve an organizational business problem, most notable in the engineering and computer science disciplines \cite{hevner2004design}.
+More importantly, the artifact must demonstrate its utility and quality through its solution to a real-world challenge.
+
+
+%In the \emph{problem identification and motivation} step (Chapter~\ref{chap:intro} and Chapter~\ref{chap:mcp_background}), the security and scalability gaps of deploying MCP in a university environment are identified from the literature and from the operational context of \aaltoai ~\cite{aalto_ai_assistant}.
+
+\paragraph{Step 1 --- Problem identification and motivation.}
+The first step of DSRM defines the specific research problem and motivates why a solution is valuable \cite{peffers2007design}.
+The problem addressed in this thesis is the absence of a standardized, secure, and scalable framework for integrating MCP into a university GenAI production system. 
+This gap is established through the motivation for the research in Chapter \ref{chap:intro} and supported in Chapter \ref{chap:mcp_background} through the analysis of MCP challenges, including cybersecurity vulnerabilities, malicious server threats, and scaling limitations.
+
+\paragraph{Step 2 --- Definition of the objectives for a solution.}
+This chapter (Chapter~\ref{chap:requirements}) define the objectives of the solution from the problem definition.
+The operational context of Aalto AI Assistant (Section \ref{sec:aalto-ai-assistant}), the AI Tutor use case (Section \ref{sec:aitutor-use-cases}), and the threat landscape defined in \ref{chap:challenges} are used to derive the functional, security, and scalability requirements in Section \ref{sec:requirements} that \UniMCP must satisfy.
+
+\paragraph{Step 3 --- Design and development.}
+The third step is to create the artifact \cite{peffers2007design}.
+Chapter~\ref{chap:design} presents the design of \UniMCP with its five guiding principles and its architecture.
+The design draws on established theory --- the threat
+model, the Zero Trust Architecture, and the gateway
+integration pattern --- to construct a solution that
+addresses the objectives defined in Step~2.
+
+\paragraph{Step 4 --- Demonstration.}
+The fourth step demonstrates the artifact in a concrete instance of the problem ~\cite{peffers2007design}.
+Chapter~\ref{chap:implementation} presents the AI Tutor proof-of-concept implementation, which instantiates \UniMCP within the real production environment of Aalto AI Assistant by implementing a transcript retrieval tool and a course search tool, both secured and routed through the \UniMCP gateway.
+
+\paragraph{Step 5 --- Evaluation.}
+The fifth step observes and measures how well the artifact
+supports a solution to the problem, comparing results from
+Step~4 against the objectives defined in Step 2.
+Chapter \ref{chap:evaluation} evaluates the AI Tutor implementation across the three dimensions corresponding to
+the thesis's research questions: secure integration and
+enforcement, scalability, and trustworthiness.
+
+\paragraph{Step 6 --- Communication.}
+The last step communicates the problem, the artifact, its utility, and the rigor of its design to relevant
+audiences \cite{peffers2007design}.
+This thesis is the primary communication artifact for two audience groups: 
+(1) Aalto University IT Services, for whom the thesis provides a documented and evaluated MCP integration framework for future university services; and
+(2) the academic research community,
+for whom \UniMCP contributes a validated framework and
+design guidelines for MCP deployment in organizational
+contexts.
+
+% ·····················
+\subsection{Requirement Derivation}
+\label{sec:rd-req-derivation}
+% ·····················
+The requirements for \UniMCP (detailed in Section \ref{sec:requirements}) are derived by
+tracing each of the three challenge layers identified in Chapter \ref{chap:challenges} to a
+concrete design obligation, rather than being defined independently of that
+analysis. 
+Table~\ref{tab:requirement-traceability} shows this traceability
+for the requirement categories introduced in Section~4.4.
+ 
+\begin{table}[h]
+\centering
+\caption{Traceability from challenge layer to requirement category}
+\label{tab:requirement-traceability}
+\begin{tabular}{p{0.28\linewidth} p{0.30\linewidth} p{0.32\linewidth}}
+\toprule
+Challenges (Chap. \ref{chap:challenges}) & Requirement category & Example requirement \\
+\midrule
+Protocol-level (no mandatory auth, single-tenant session model) &
+Functional (FR1, FR2) & Gateway mediation of every tool call;
+identity-aware tool handlers \\
+Ecosystem-level (credential exposure, tool poisoning, immature
+enterprise tooling) & Security (SR1, SR2) & Internal-tool priority for
+identity-sensitive data; mandatory token on every request \\
+University-context (GDPR, data classification, SSO, multi-role access,
+audit accountability) & Functional \& security (FR1, FR3) & Consent
+enforcement before personal-data access; Azure AD--issued identity
+propagated to tool handlers \\
+Protocol-level (single-tenant session model) \& ecosystem-level (immature
+enterprise tooling) & Scalability & Support for concurrent multi-user
+sessions against one server instance \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+Two additional inputs constrain this derivation beyond the literature
+review: (1) the operational context of Aalto AI Assistant, which fixes the
+available identity provider (Azure AD), the existing API management layer
+(3scale), and the existing test endpoints (SISU, MDM Persons API), and (2)
+an interview with 20 randomly selected Aalto students (Section~4.3), which
+established that transcript-aware course recommendation is the highest-value
+student-facing use case and therefore the one against which the security
+and scalability requirements are validated.
+ 
+
+
+
+% ·····················
+\subsection{Case Study Context: Aalto AI Assistant}
+\label{sec:aalto-ai-assistant}
+% ·····················
+Aalto University is a leading Finnish university that pioneers in AI adoption to institutional teaching and research.
+This can be seen by their active utilization of artificial intelligence into studies, research, and operations. 
+The most prominent application is \aaltoai \cite{aalto_ai_assistant}, a chat-based platform developed in-house by \aalto IT Services and deployed in May 2024. 
+Under the hood, it is powered by modern large language models, including OpenAI's GPT-5.4 and GPT-5.5 and Google's Gemini 2.5 Flash.
+It provides access to otherwise paid language models such as GPT 5.5 for all internal staff and students. 
+\aaltoai is used as the MCP host for the proof-of-concept.
+It is used as the main case study and provides a real production environment in which to design, implement, and evaluate the proposed MCP Integration Framework.
+
+% ·····················
+\subsection{Proof-of-Concept Use Case: AI Tutor}
+\label{sec:aitutor-use-cases}
+% ·····················
+
+% motivate by using the interview results
+The demand for AI assistant in study can be observed in an empirical interview with 20 randomly selected students at \aalto.
+\aitutor supports students in study planning by securely accessing the student’s transcript and suggesting relevant courses, taking into account student's study history and prompts.
+
+% ·····················
+\subsection{Requirements for \UniMCP}
+\label{sec:requirements}
+% ·····················
+The requirements for \UniMCP are derived from three sources: 
+the architecture and challenges of MCP identified in Chapter \ref{chap:challenges}, 
+the operational context of Aalto AI Assistant described in Section~\ref{sec:aalto-ai-assistant}, 
+and the AI Tutor use case defined in Section~\ref{sec:aitutor-use-cases}.
+The requirements are organized into three categories: functional, security, and scalability.
+
+\subsubsection{Functional Requirements}
+
+The functional requirements define what \UniMCP must take into account in order to support MCP integration into the IT production systems of a university.
+ 
+\textbf{FR1 --- University Identity Integration.}
+\UniMCP must authenticate users via the university's identity provider before any MCP tool is invoked.
+The authenticated identity must be propagated to individual MCP servers so that tool handlers can make identity-aware
+access decisions. 
+For example, the student study transcript must be only accessible to the transcript's owner.
+
+\textbf{FR2 --- Gateway Mediation.}
+All tool invocations from MCP host to MCP servers must be routed through a central gateway, i.e., an enforcement point for authentication, authorization, and logging.
+This follows the gateway architectural pattern identified in Section~\ref{sec:mcp-ecosystem} as the ecosystem's primary
+response to the multi-tenant MCP governance gap.
+
+\textbf{FR3 --- User Consent Enforcement.}
+Before any tool that accesses personal data is invoked, the gateway must ensure that the user has given their consent to that access during the current session, in line with the MCP specification's requirement that the host handles user authorization decisions \cite{mcpspec2026} and with GDPR's requirement for freely given, specific, and informed consent.
+
+
+
+\subsubsection{Security Requirements}
+The security requirements are derived from the threat categories identified by Narajala et al. \cite{narajala2025enterprise} and the findings of Hasan et al. \cite{hasan2026mcp_security}. 
+
+% Follow the STRIDE Security Model?
+In addition, MAESTRO threat modeling framework is also consulted to form the security requirements in \UniMCP presented as follow. 
+
+\textbf{SR1 --- Internal Tool Priority}. 
+
+
+% How to avoid identity spoofing? 
+\textbf{SR2 --- Authentication}
+Every request to the MCP server must carry a valid Aalto identity token issued by Azure Active Directory.
+% How to prevent users from tampering with the models/API or data in Aalto AI Assistant?
+
+\subsubsection{Scalability Requirements}
 
 \clearpage
+% ============================================================
+\section{Design of \UniMCP}
+\label{chap:design}
+% ============================================================
+This chapter focuses on the design of \UniMCP, the proposed integration framework for connecting a university GenAI assistant to institutional tools and data sources using MCP. 
 
-\section{Results}
+\subsection{Purposes of \UniMCP}
+\UniMCP aims to provide a framework that answers two major questions:
+\begin{itemize}
+    \item Secure integration: How can MCP be integrated into a university GenAI production system without exposing sensitive data or allowing unauthorized tool use?
+    \item Scalability: How can new university tools be added without redesigning the AI assistant pipeline?
+\end{itemize}
 
-%Present the results of your study here and answer the research questions, asked earlier in the thesis (in the introduction, perhaps), this study strives to answer. 
+\subsection{Principles of \UniMCP}
+The design of \UniMCP is guided by five principles that translate the requirements of Chapter~\ref{chap:requirements} into architectural decisions.
+The framework follows these principles:
+
+\textbf{Principle 1 --- University-Identity-First.}
+Every MCP request must be associated with an authenticated university user.
+
+\textbf{Least privilege.}
+AI Tutor should access only the data required for the current task.
+
+\textbf{User-scoped authorization.}
+A student should only be able to retrieve their own transcript.
+
+\textbf{Tool approval.}
+Only approved MCP tools should be available in the AI assistant application.
+
+Data minimization.
+Sensitive transcript data should be summarized or filtered before being passed to the model.
+
+Auditability.
+Tool calls should be logged for security review and debugging.
+
+Prompt injection resistance.
+External data should be treated as untrusted and should not be allowed to override system instructions.
+
+
+
+\subsection{High-Level Architecture}
+\label{sec:architecture}
+
+\subsubsection{MCP host}
+
+\subsubsection{MCP server}
+
+\subsubsection{MCP deployment pattern}
+Follow the suitable deployment pattern based on the univeristy's existing architecture, operational resources, and risk tolerance.
+The pattern can be API gateway-centric integration or containerized microservices. 
+
+\clearpage
+% ============================================================
+\section{Implementation of \UniMCP: AI Tutor Application}
+\label{chap:implementation}
+% ============================================================
+
+As a proof-of-concept to implement and validate the \UniMCP framework in a real-life problem, AI Tutor, which is embedded in Aalto AI Assistant, is developed as a tailored AI tutor for students who are studying towards a degree at Aalto University.
+Essentially, AI Tutor securely accesses the study transcript of the student user and suggest courses based on the student's transcript, helping students plan their study.
+
+\subsection{Implementation Context}
+This thesis work is carried out as a work project at Aalto University IT Services and Aalto AI Assistant serves as the real production environment for the case study.
+
+\subsection{AI Tutor and its use cases} 
+% Motivation: why AI Tutor
+To identify the most helpful applications of MCP for students, an interview with 20 students is conducted. 
+AI Tutor is chosen as a proof-of-concept implementation to demonstrate the use of \UniMCP. 
+It securely accesses the student’s transcript.
+It recommends courses based on transcript data and possibly course catalogue data.
+It is embedded in Aalto AI Assistant.
+
+Describe the student journey:
+Student opens AI Tutor.
+Student asks for course recommendations.
+AI Tutor requests transcript data through MCP.
+AI Tutor retrieves course information.
+AI Tutor suggests courses.
+AI Tutor explains the basis of recommendations.
+
+\subsection{Frameworks}
+FastMCP is chosen to be the framework for the implementation of \aitutor.
+
+\subsection{MCP Tools Implemented}
+Course search tool.
+
+\subsection{Security Controls Implemented}
+In teaching operations inside universities, sensitive personal data and critical workflows are heavily involved. 
+
+\subsection{Implementation Limitations}
+
+\clearpage
+% ============================================================
+\section{Evaluation and Results}
+\label{chap:evaluation}
+% ============================================================
+
+%Present the results of your study here and answer the research questions, asked earlier in the thesids (in the introduction, perhaps), this study strives to answer. 
 % The scientific value of your work is measured by the results you obtain along with the arguments you give to back the answers to your research questions.
 
 %Be critical of the significance of your results. 
@@ -632,12 +1493,9 @@ Aalto AI Assistant is a chat-based application developed by the IT Services at A
 %This part should discuss how reliable the data used in the study are. 
 %You may discuss the reliability of the conclusions drawn from the study either in this chapter or later in the discussions part. 
 %You may have the discussion in a chapter of its own, separate from the summary or conclusions.
+\subsection{Evaluation Methods}
 
-\subsection{Secure integration and enforcement}
-Follow the STRIDE Security Model?
-How to avoid identity spoofing? 
-How to prevent users from tampering with the models/API or data in Aalto AI Assistant?
-
+\subsection{Secure Integration and Enforcement}
 The problem with Haystack is the processing of Image Message type.
 When given a URL in image URL parameter, haystack will try to retrieve that data, meaning the calls for this come from the backend and can potentially expose internal data to models. 
 \subsection{Scalability}
@@ -645,1081 +1503,40 @@ When given a URL in image URL parameter, haystack will try to retrieve that data
 \subsection{Trustworthiness}
 
 \clearpage
-
-\section{Discussion}
-\clearpage
-
-\section{Conclusions}
-\label{sec:summary}
-
+\section{Conclusion}
+\label{sec:conclusion}
 %This is where you tie up any loose ends. Tell your reader briefly and clearly what you have done, what you have discovered, and the value of your discovery in the context of similar work done earlier. Draw clear conclusions regarding the research problem, sub-problems or hypotheses. You also discuss future lines of study and new questions your study might have posed.
 
+% Why it is relevant to GenAI production systems.
+Since its introduction in 2024, MCP has become a new standard that redefines how large language models interact with external tools and resources, as it helps facilitate robust extension of a GenAI system's capabilities without modifying its underlying agentic pipeline.
+Therefore, software developers can reduce development time and complexity when building an AI application system and connecting the AI models to external resources.
+However, as a consequence, exposing large language models to the external world means that MCP brings new security and ecosystem challenges.
+The lack of established frameworks for building secure, scalable and trustworthy MCP deployments in university production environments represents a significant research gap that this thesis aims to address.
+The thesis follows the six-step process of the design science research methodology to design \UniMCP.
 
+To verify the proposed \UniMCP framework, the case study of Aalto AI Assistant, a chat-based GenAI application developed by Aalto University IT Services in Finland, is conducted.
+As a proof of concept for implementing and validating the \UniMCP for university contexts, this thesis develops AI Tutor, a tailored student-facing assistant within Aalto AI Assistant. 
+
+\clearpage
+\section{Usage of artificial intelligence}
+In this thesis work, AI tools are used as support during the programming and writing processes.
+Codex is used for studying the code base of \aaltoai, implementing \aitutor, debugging, and testing. 
+
+During the writing process, AI is used to check typing and grammar mistakes and unclear or incoherent sections.
+All suggestions were reviewed, and all final edits were made manually. 
+AI is also used to help format tables seen in this work and suggest suitable layouts for them.
 
 \clearpage
 %% Bibliography/ list of references
-%%
 \thesisbibliography
-
-\begin{thebibliography}{99}
-
-%% A quick-and-dirty hack to add text between the bibliography section title
-%% and the first reference. You don't need this in your thesis, so remove it.
-  \item[]
-  \hskip-\leftmargin
-  \begin{minipage}{\textwidth}
-	This is the list of references to the sources cited in 
-	appendix~\ref{app:layout}. The list more or less follows the Vancouver 
-	style (IEEE). See appendix~\ref{app:reference} for a detailed exposition 
-	on cross-referencing and bibliography styles. Follow the description there.
-
-	\hspace{1em}The references are in alphabetical order here, which is the
-	typical way to organise the reference list. For a short reference list, the
-	other approach is to put the references in the order of citation.
-  \end{minipage}
-  \bigskip
-%% End of hack.
-
-  \bibitem{Bailey} Bailey, C., \textit{The Basics of Typography}. [Online].
-	\url{https://www.webfx.com/blog/web-design/the-basics-of-typography} 
-	(accessed on 14 July 2021).
-
-  \bibitem{Bringhurst} Bringhurst, R., \textit{Horizontal Motion. The Elements 
-  	of Typographic Style}, Point Roberts, WA: Hartley \& Marks, 1992. p. 26, 
-    pp.\ 25--36. Also available online as version 3.0 at  
-    \url{https://smallpressblog.files.wordpress.com/2017/11/bringhurstelementsselections1.pdf} (accessed on 7 May 2021).
-
-  \bibitem{aaltolib} Citation Guide: Making a bibliography, \textit{Aalto 
-	University Learning Centre}. Online article. Available  
-	\url{https://libguides.aalto.fi/c.php?g=410674&p=2797572}
-	(accessed on 14.7.2021)
-
-  \bibitem{Unna} de Buen Unna, J., \textit{Manual de dise\~no editorial}, 4. ed. 
-    corrigida y aumentada, Somonte-Cenero, Gij\'on: Ediciones Trea, 2014.
-
-  \bibitem{Dyson} Dyson, M. C., and Kipping, G. J., ``The Effects of Line Length 
-    and Method of Movement on Patterns of Reading from Screen,'' 
-    \textit{Visible Language,} vol.~2, no.~2, pp. 150--181, 1998.
-
-  \bibitem{Shaik} Shaikh, A. D., ``The Effects of Line Length on Reading Online 
-    News,'' \textit{Usability News}, vol.~7, no.~2, July 2005.
-
-  \bibitem{aaltovisual} ``Visual elements,'' \textit{Aalto University Brand 
-	Library}. [Online].
-	\url{https://www.aalto.fi/en/brand-library#/visual-elements/typography} 
-	(accessed 14 July 2021)
-
-  \bibitem{Wikilinelength} Wikipedia contributors, ``Line length,'' 
-    \textit{Wikipedia: The Free Encyclopedia}, Wikimedia Foundation, Inc., 
-    22 July 2004.
-    \url{https://en.wikipedia.org/w/index.php?title=Line_length&oldid=997524503}
-    (accessed 7 May 2021).
-
-  \bibitem{enwiki:1026690618} Wikipedia contributors, ``Leading,'' 
-    \textit{Wikipedia, The Free Encyclopedia}, 2021.
-    \url{https://en.wikipedia.org/w/index.php?title=Leading&oldid=1026690618}
-    (accessed 14 July 2021).
-
-\newpage
-%% The same hack again
-  \bigskip
-  \item[]
-  \hskip-\leftmargin
-  \begin{minipage}{\textwidth}
-	The reference list that follows are examples containing the required 
-	information about the cited sources, and it more or less abides to the 
-	Vancouver style (IEEE). See appendix~\ref{app:reference} for guidelines for 
-	making your reference list correctly.
-  \end{minipage}
-%\medskip
-%%
-
-  \bibitem{Adida} Adida, B., \textit{Advances in Cryptographic Voting Systems}, 
-	PhD Thesis, Massachusetts Institute of Technology, Cambridge, Massachusetts,
-	2006. Online document. Accessed 19.1.2007. Available: 
-	\url{http://crypto.csail.mit.edu/~cis/theses/adida-phd.pdf.}
-
-%% Note the '\' character after the full-stop and the capitalised initial in
-%% the author's name. It forces a normal-sized space between the full-stop and
-%% the initial. Otherwise a capital letter after a full-stop would imply the
-%% start of a new sentence, putting a space a little longer than normal.
-  \bibitem{bcs} Bardeen, J., Cooper, L.\ N. ja Schrieffer, J.\ R., ``Theory of 
-	Superconductivity,'' \textit{Physical Review,} 1957, vol.~108, no.~5, 
-	pp.\ 1175--1204.
-
-  \bibitem{Deschamps} Deschamps, G.\ A., ``Electromagnetics and Differential 
-	Forms,'' \textit{Proceedings of the IEEE,} 1981, vol.~69, no.~6, pp.\ 
-	676--696.
-
-  \bibitem{Itkonen} Itkonen, M., \textit{Typografian käsikirja}, 3rd edition, 
-	Helsinki, RPS-yhtiöt, 2007.
-
-  \bibitem{Kauranen} Kauranen, I., Mustakallio, M. and Palmgren, V., 
-    \foreignlanguage{finnish}{\textit{Tutkimusraportin kirjoittamisen opas opinnäytetyön tekijöille}, 
-    Espoo, Teknillinen korkeakoulu,} 2006.
-
-  \bibitem{webpage} Kilpeläinen, P., 
-	\textit{\foreignlanguage{finnish}{WWW-lähteisiin viittaaminen 
-	  tutkielmatekstissä}.} Online article. Updated 26.11.2001. 
-	Accessed: \url{http://www.cs.uku.fi/~kilpelai/wwwlahteet.html.}
-
-  \bibitem{Koblitz} Koblitz, N., \textit{A Course in Number Theory and 
-  	Cryptography. Graduate Texts in Mathematics 114}, 2nd edition, New York, 
-    Springer, 1994.
-
-%% An example of how to force hyphenation in Finnish. Note the use of quotation
-%% marks. \foreignlanguage affects quotation marks, since their use differs in
-%% different languages. Since this work is in English, the quotaion marks are
-%% used as they should be in English and hence are outside the marco.
-  \bibitem{Lindblom} Lindblom-Ylänne, S. and Wager, M.,
-    ``\foreignlanguage{finnish}{Tieteellisten opinnäytetöiden ohjaaminen},'' in:
-    Lindblom-Ylänne, S. and Nevgi, A. (Eds.), \textit{Yliopisto- ja
-    korkeakouluopettajan käsikirja}, Helsinki, WSOY, 2004, pp.\ 314--325.
- 
-  \bibitem{Loh} Loh, N.\ C., \textit{High-Resolution Micromachined 
-  	Interferometric Accelerometer}, Master's thesis, Massachusetts Institute of 
-    Technology, Cambridge, Massachusetts, 1992.
-
-  \bibitem{Lonnqvist} Lönnqvist, A., \textit{Applications of hologram-based 
-  	compact range: antenna radiation pattern, radar cross section, and absorber 
-  	reflectivity measurements}, Doctoral thesis, Teknillinen korkeakoulu, 
-    Department of Electrical and Telecommunications Engineering, 2006.
-
-  \bibitem{Miinusmaa} Miinusmaa, H., \textit{Neliskulmaisen reiän poraamisesta
-	kolmikulmaisella poralla}, Master's thesis, Teknillinen korkeakoulu,
-	Department of Mechanical Engineering, Espoo, 1977.
-
-  \bibitem{interview} Palmgren, V., Planning Officer, Teknillinen korkeakoulu, 
-    library, Otaniementie 9, 02150 Espoo. Interview, 15.1.2007.
-
-  \bibitem{kone} Pohjois-Koivisto, T., ``\foreignlanguage{finnish}{Voiko kone 
-	tulevaisuudessa arvata tahtosi?,}'' \textit{Apropos.} Online publication, 
-	February, no.~1, 2005. Accessed 19.1.2007. Available:
-	\url{http://www.apropos.fi/1-2005/prima.php.}
-
-  \bibitem{Ribeiro} Ribeiro, C.\ B., Ollila, E. and Koivunen, V., ``Stochastic 
-	Maximum-Likelihood Method for MIMO Propagation Parameter Estimation,'' 
-	\textit{IEEE Transactions on Signal Processing}, vol.~55, no.~1, pp. 46--55.
-	[Online]. Accessed 19.1.2007. Also available in print.
-	DOI: 10.1109/TSP.2006.882057.
-
-  \bibitem{sfs} SFS 5342, \textit{Kirjallisuusviitteiden laatiminen}, 2nd 
-	edition, Helsinki, Suomen standardisoimisliitto, 2004. 20~p.
-
-  \bibitem{Sihvola} Sihvola, A. et al., ``Interpretation of measurements of 
-	helix and bihelix superchiral structures,'' in: Jacob, A.\ F. and Reinert, 
-	J. (Eds.) \textit{Bianisotropics '98 7th International Conference on Complex
-	Media}, Braunschweig, 3.--6.6.1998, Braunscweig, Technische Universität 
-	Braunschweig, 1998, pp.\ 317--320.
-
-  \bibitem{Stieber} Stieber, T., ``GnuPG Hacks,'' \textit{Linux Journal.} Online
-	publication, 2006, November, no.~143. Accessed 19.1.2007. Also available in 
-	print. Available: \url{http://www.linuxjournal.com/article/8732.}
-
-\end{thebibliography}
+\bibliographystyle{IEEEtran}   % use this for IEEE style
+\bibliography{thesisreferences} 
 
 %% Appendices
 %% If you don't have appendices, your thesis ends here. Remove \clearpage,
 %% \thesisappendix and the following text below. The last command of this file
 %% is \end{document}.
-\clearpage
 
 \thesisappendix
-
-\section{Contents of an appendix}
-\label{app:contents}
-
-Appendices are not essential in a thesis, and so you must plan the content of 
-your thesis as if it does not contain an appendix. The appendix cannot be used 
-as a dumping ground for text and ideas from an overgrown thesis.
-
-An appendix is an independent entity, even though it complements the thesis. 
-So, the appendix is not, say, just a list or image or table, but contains 
-explanatory text as well that indicates the purpose of its content. It can 
-contain code listings, like the one below for a simplified list of commands to 
-create an appendix.
-\begin{verbatim}
-	\clearpage
-	\appendix
-	\addcontentsline{toc}{section}Contents of an appendix}
-	\thispagestyle{empty}
-	\section*{Contents of an appendix}
-	...
-	text
-\end{verbatim}
-
-Equation numbering in the appendix forms a separate, complete entity. Here are a couple of examples how equations in an appendix are numbered:
-\begin{align}
-	(x+a)^n &= \sum_{k=0}^n \binom{a}{b} x^n a^{n-k}, \label{appeq:1}\\
-	\sin\alpha \pm \sin\beta &= 2\sin\left(\frac{\alpha\pm\beta}{2}\right)
-	\sin\left(\frac{\alpha\mp\beta}{2}\right). \label{liitekaava2}
-\end{align}
-
-The appendix can contain figures that do not fit in to complement the text in 
-the thesis. The numbering of figures is like that of equations: see figure~\ref{appfig:refraction}.
-
-%% Example of a figure in the appendix. Note how b places the figure at the
-%% bottom of the page.
-\begin{figure}[b]
-	\centering
-		\includegraphics[height=31mm]{./linediagram.pdf}
-	\caption{Figure and caption to show the numbering in the appendix.}
-	\label{appfig:refraction}
-\end{figure}
-
-The numbering of tables is like that for equations and figures, as is evident 
-from the caption of table~\ref{apptab:schedule}.
-
-%% Example of a table in the appendix. Note how h places the table in the
-%% current position.
-\begin{table}[htb]
-	\centering
-	\caption{Caption for the table.}
-	\label{apptab:schedule}
-	\sffamily% change the font in the table to sans serif
-	\fbox{
-		\begin{tabular}{lp{0.5\linewidth}}
-			9.00--9.55  & Safety instructions on the use of laboratories\\
-			9.55--10.00 & Transfer to the laboratory
-		\end{tabular}}
-\end{table}
-
-
-\clearpage
-\section{Page layout and typographical design}
-\label{app:layout}
-
-\subsection*{Layout choices}
-
-Designing a visually pleasing, balanced and easily readable document requires 
-setting several typographic parameters, one of the most important ones being the
-line length. If too wide, the reader’s eyes have trouble focusing on the text 
-because the line length makes it difficult to gauge when the line begins and 
-where it ends; too narrow, and the reader’s eyes have to travel back too often, 
-breaking their reading rhythm and often causing them to begin the next line 
-before finishing the current one.
-
-Traditional research on the effect of line length on readability of printed text
-have found that 45--75 characters per line (cpl) is an acceptable range, with 
-66\,cpl being the ideal \cite{Bringhurst, Wikilinelength}. This number includes 
-letters, numbers and spaces. The line length in conventional books tends to be 
-30 times the type size, but anything between 20 and 40 times is considered 
-acceptable. For example, for a 10-pt font, an acceptable line length is 300 
-points (30$\times$10), or about 10,58\,cm. The reader’s experience as a reader 
-also affects the preferred line length; an experienced reader can handle between
-45 and 80\,cpl for a comfortable reading experience, whereas a novice prefers a 
-line length of between 34 and 600\,cpl \cite{Unna}.
-
-\begin{figure}[b]
-	\centering
-	\fbox{\parbox{300pt}{\footnotesize Lorem ipsum dolor sit amet, consectetur 
-			adipiscing elit. Pellentesque et urna posuere, aliquam risus et, 
-			ullamcorper quam. Pellentesque sed dignissim metus. Etiam turpis 
-			dui, suscipit sed libero vel, vulputate imperdiet risus. Sed rutrum
-			magna nec neque ornare, at imperdiet sapien porttitor. Sed
-			fringilla, enim nec sollicitudin laoreet, arcu leo convallis nisl, 
-			eget rhoncus ligula libero malesuada justo.}}
-	\caption{Text typeset in a 300-pt-wide box using a font size of 10\,pt. The 
-		resulting average number of characters per line is about 60. The text is
-		framed to make the box size evident.}
-\end{figure}
-
-Reading text from a screen poses challenges absent in paper: glare, flicker and 
-scrolling. Research seems to indicate that longer lines are better for scanning 
-through the text whereas shorter lines are preferred for accurate reading. One 
-study says that reading speed at a certain level of comprehension seems to be 
-better for longer lines (100\,cpl) than for shorter lines (25\,cpl) 
-\cite{Dyson}. Another study \cite{Shaik} indicates that subjective preferences 
-for longer or shorter line lengths appear to be contradictory. About 60\% of 
-the test subjects preferred the presented shortest (35\,cpl) or longest 
-(95\,cpl) lines, and at the same time all of them disliked either the 
-shortest or the longest lines. (See also \cite{Wikilinelength}.)
-
-Another important typographical parameter is line leading or leading, which 
-refers to the distance between adjacent lines of text. Double spacing is a 
-practice from the era of typewriters particularly in academia to allow making 
-handwritten comments in documents. Typewriters had a limited number of options 
-for leading, and double spacing was chosen as a norm. Too much leading can cause
-continuity problems, since the reader’s eyes must travel a greater distance 
-between lines of text. The amount of leading is a compromise between ease of 
-reading, desired efficiency in the use of vertical space, weight and type (serif
-or sans serif) of the typeface used, and visual aesthetics. Naturally, whether a
-document is printed or published online affects the leading, but even the 
-language of the text must be considered when deciding on the required leading. 
-(See also \cite{enwiki:1026690618}.)
-
-\subsection*{Aalto University’s visual guideline for writing documents}
-
-Of Aalto University’s visual guidelines \cite{aaltovisual}, the one that applies
-to document writing is related to the use of fonts. This guideline specifies 
-that the body of the text be in the serif font Sentinel and the sec-tion titles 
-in boldface of the sans serif font Nimbus Sans. These fonts should be available 
-on all Aalto computers. However, being a commercial product, Sentinel can be 
-replaced with Georgia and Nimbus Sans with Arial, both of which come installed 
-in all Windows machines. Thus, Georgia and Arial are the fonts used in the Word 
-template. The font choices for this \LaTeX{} template are a Times and Helvetica 
-clone from the \verb+newtxtext+ package since it provides support for math fonts
-and its output is a PDF/A compliant pdf.
-
-\subsection*{Layout and typographical specifications}
-\subsubsection*{Page layout in the thesis}
-
-The thesis is typeset on A4-sized paper. The text width is set to an average of 
-about 75\,cpl as a compromise between having to read the thesis on a computer 
-screen and on paper, as discussed above. For the font size of 12\,pt to be used 
-in the body text, the text width works out to 14,2\,cm. For the online version 
-of the document, the text column is centred, implying that the left and right 
-margins are both 3,4\,cm. If you want to print the document and bind it, the 
-binding margin must be 4,8\,cm. The text height is set to 23\,cm by setting the 
-top margin to 3,7\,cm and the bottom margin to 3\,cm. The layout dimensions are 
-summarised in table~\ref{tab:layout}.
-
-\begin{table}[htb]
-	\centering
-	\caption{Page layout dimensions.}
-	\label{tab:layout}
-	\sffamily% change the font in the table to sans serif
-	\begin{tabular}{ll}
-		\hline
-		Paper size & A4\\\hline
-		Text width & 14,2\,cm \\\hline
-		Top margin & 3,7\,cm \\\hline
-		Bottom margin & 3,0\,cm \\\hline
-		\textbf{Online document} & \\\hline
-		Left margin & 3,4\,cm \\\hline
-		Right margin & 3,4\,cm \\\hline
-		\textbf{Printed document} & \textbf{(for binding)} \\\hline
-		Left margin & 4,8\,cm \\\hline
-		Right margin & 2,0\,cm \\\hline
-	\end{tabular}
-\end{table}
-
-
-\subsubsection*{Sectioning and text body}
-
-The font for the body text is a 12-pt serif Times clone and a Helvetica bold 
-clone for the section titles. Use at most three levels of hierarchy in your 
-text: section, subsection and subsubsection. The lower section numbering must 
-use the section number of the higher section. For example, section number 2.1.3 
-refers to section 2, subsection 1 and subsubsection 3.
-
-\clearpage
-\section{Reference and in-text citation guidelines}
-\label{app:reference}
-
-With regard to standard practice across academic disciplines, it is important to
-use an in-text citation to indicate when your work borrows or refers to words or
-ideas from a specific source. A full reference of this source should be included
-in your ‘References’ / ‘Bibliography’ / ‘Works Cited’ section as well.
-
-There are two major referencing styles: the Harvard style and the Vancouver 
-style. The former was first introduced in a journal article by Professor of 
-Zoology Edward Marks in 1881 during his tenure at Harvard University (Chernin, 
-1988, 1062). It has since become an umbrella term to refer to styles which 
-utilise author-date (e.g., APA style) or author-page (e.g., MLA style) within 
-parentheses (). It still remains in use to some degree in the natural sciences 
-(e.g., American Chemical Society, 2006) and has become the predominant style 
-within the social sciences (e.g., American Psychological Association, 2010), and
-the arts and humanities (e.g., Modern Languages Association, 2016; University of
-Chicago Press, 2017). In contrast, the latter Vancouver style has become a very 
-common style within the fields of engineering, technology and science. The name 
-is derived from the inaugural meeting in Vancouver, Canada in 1978 of a 
-committee later referred to as the International Committee of Medical Journal 
-Editors (ICMJE) (BMA, 2012). The style is typified by its use of numbers for 
-in-text citations; as such, it is also known as the author-number system. One of
-the most common versions of the Vancouver Style is the IEEE Reference Guide \\
-(IEEE 2018). The numbers used for in-text citations correspond to a numbered 
-reference list at the end of the text. Typically, the numbers refer to the order
-in which the referenced authors first appear in the text. Thereafter, they 
-continue to be referred to by this number. A lesser utilised variation of this 
-style can feature the numbers corresponding to an alphabetical list of authors.
-
-There is a third system of notes and bibliography. This is one of the two styles
-in the Chicago Manual of Style; the other is an author-date style. Notes and 
-bibliography is mostly used by the fields of literature and history. It is 
-occasionally utilised in the field of arts, but it is considerably less common 
-than the Harvard style. Among the 97 English doctoral dissertations available 
-online in AaltoDoc as of 5 March 2020, only 14 utilised this method. As it is 
-relatively rare within Aalto University, it is recommended to visit the Chicago 
-Manual of Style online for the reference style guide for it.
-
-The two key considerations in adopting a particular style are that you agree 
-with your supervisor on the particular style at the start of your thesis writing
-process and that you remain consistent in the use of the style throughout your 
-thesis. Your supervisor can provide recommendations for you on the common style 
-guides generally used in your field.
-
-Below, you will find general guidelines to these two major styles with reference
-to the specific style guides in use. Corresponding examples are provided in the 
-boxes below. Please note that the use of boxes here is only to visually separate
-the examples for clarity’s sake and that boxes should not be used when quoting 
-or paraphrasing in your own thesis.
-
-
-\subsection*{Direct quotes}
-
-If you are using the exact wording from a source, you should place this in 
-double quotation marks (“ ”) followed by the author, date, and page number in 
-parentheses (if using the Harvard style) or a number in square brackets [if 
-using the Vancouver style]. The citation should be on the same line and inside 
-the punctuation. This citation should correspond to a full reference in the 
-References / Bibliography / Works Cited section of your thesis. The punctuation 
-used between the author, date, and page number may vary depending on which style
-guide you are using (compare, for example, The Chicago Manual of Style 
-(University of Chicago Press, 2017), The Publication Manual of the American 
-Psychological Association (APA, 2018), The MLA Handbook (MLA, 2016) and The New 
-Oxford Style Manual (OUP, 2016)). However, it should be noted that the frequency
-of direct quote usage varies significantly between academic fields. While it is 
-a fairly common practice to utilise quotes within art, design, architecture and 
-business, it is rare in the science and engineering fields. Therefore, it is 
-recommended that you ask your supervisor or check well-known journals in your 
-field to gauge the frequency of quoting preferred by experts in your field.
-
-
-\subsubsection*{Quoting in Harvard style}
-
-\newcounter{example}[section]
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Quote, information-prominent, American 
-Sociological Association (2019) style
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-	Attending to these breakdowns not only result in an on-going re-constitution
-	of relations between people and things but are also hotbeds for unleashing 
-	everyday “creativity, invention, imagination, and artfulness” (Jackson, 
-	2014: 226).
-	}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Durrani, M. 2018. Designers by any other name: exploring the 
-sociomaterial practices of vernacular garment menders. \textit{Design Research 
-Society International Conference: Catalyst. DRS International Conference 
-Series.} 4: 1731-1746. ISBN 978-1-912294-19-0 (electronic). 
-DOI: 10.21606/dma.2018.495. \copyright{} 2018 Design Research Society. This work
-is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
-International License. \url{https://creativecommons.org/licenses/by-nc-sa/4.0/.}
-
-\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Quote, author-prominent, American 
-Psychological Association (2010) style
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-	Philosopher Mark Johnson (2007) argued that meanings emerge from “deeper 
-	explorations into the qualities, feelings, emotions, and bodily processes” 
-	(p. x).
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Aktaş, B. \& Mäkelä, M. (2019). Negotiation between the maker 
-and material: Observations on material interactions in felting studio. 
-\textit{International Journal of Design}, 13(2): 55--67. \copyright{} 
-\textit{2019 Aktaş \& Mäkelä. Copyright for this article is retained by the 
-	authors, with first publication rights granted to the International Journal 
-	of Design. All journal content, except where otherwise noted, is licensed 
-	under a Creative Commons Attribution-NonCommercial-NoDerivs 2.5 License.}
-
-
-\subsubsection*{Block quoting}
-
-Block quotes are used for longer quotes. Note the line indentation on each line 
-of the block quote below, starting from “There was \ldots”, and the absence of 
-quotation marks. Each style guide recommends its own minimum text length before 
-using block quoting. [Compare: AMA - four lines of text or more; APA - 40 words 
-or more; or Chicago - 100 words or more.]
-
-\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Block quote, Harvard style, as 
-recommended by journal
-
-\vspace{1ex}
-{\centering
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-	When the Center for Bits and Atoms won the National Science Foundation Grant
-	in 2003, MIT engineers began to look for local communities around the world 
-	they could help via digital fabrication: “Instead of bringing information 
-	technology to the masses, the fab labs bring information technology 
-	development to the masses,” explained Gershenfeld, in the official press 
-	release (NSF 2004). Karlsen had a more colourful version:\\[1em]
-	\mbox{}\hfill\parbox{125mm}{There was an innovation competition launched by 
-		MIT globally to develop local projects. MIT sent some of its best 
-		teachers to Norway to find a suitable cooperation project. They found us
-		through Telenor, who told them: ‘There is this crazy guy lost in the 
-		fjord who devised sensors for his animals.’ We enjoyed a great year of 
-		cooperation with MIT in 2001 and we were invited to Boston to present 
-		and develop this project.}
-}}}
-}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Kohtala, C \& Bosqu\'e, C. (2014). The Story of MIT-Fablab 
-Norway: Community Embedding of Peer Production. Journal of Peer Production, 
-5 (8): 1--8. ISSN 2213-5316 (electronic). \copyright{} 2014 public domain.  \url{http://peerproduction.net/issues/issue-5-shared-machine-shops/peer-reviewed-articles/the-story-of-mit-fablab-norway-community-embedding-of-peer-production/}
-
-
-\subsection*{Paraphrasing}
-
-Paraphrasing is a more prevalent citation practice in many academic fields. In 
-engineering and science, paraphrasing tends to dominate with quotations used 
-only sparingly. In other fields, such as art and design, the ratio of quoting to
-paraphrasing varies significantly. Again, it is best to ask your supervisor or 
-review journals from your field to see how common the practice is amongst your 
-academic peers.
-
-The intent behind paraphrasing is that you write the ideas or arguments of a 
-source in your own words. This citation practice can allow for better 
-integration of ideas, argumentation, and flow within the text. A good rule of 
-thumb for paraphrasing is to have more than 80\% of the paraphrased text in your
-own words. If you only change a few words from the original, you can run the 
-risk of plagiarism, even if you cite the source. Words matter. If you use the 
-exact combination of words from another author, these must be in quotes.
-
-
-\subsubsection*{Paraphrasing in Harvard style}
-
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Paraphrase, author prominent, Chicago 
-Manual of Style (2017) style
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{von Hippel (1986) suggested a 
-			four-step process for working with lead users: first identifying 
-			important trends and key customer needs, then identifying lead users
-			and understanding their needs and possible solutions and finally 
-			working with lead users in order to improve or generate 
-			product/service concepts.
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Hyysalo, S., Kohtala, C., Helminen, P., Mäkinen, S., Miettinen,
-V., \& Muurinen, L. (2014). Collaborative futuring with and by makers. 
-\textit{CoDesign}, 10(3--4), 209--228. DOI: 10.1080/15710882.2014.983937. 
-\copyright{}
-\textit{2014 The Authors. This is an Open Access article. Non-commercial reuse, 
-	distribution, and reproduction in any medium, provided the original work is 
-	properly attributed, cited, and is not altered, transformed, or built upon 
-	in any way, is permitted.}
-
-\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Paraphrase, information-prominent, 
-Harvard style as recommended by journal
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-Obviously digital technologies will not destroy comics as we know them, but they
-may change their underlying decorum. In reality, these changes have continuously
-shaped the lives of the industry’s amateurs and semi-professionals, who have to 
-organize their time around a bricolage of fragmented schedules and poorly paid 
-work (Woo 2015): from daily feeding a Patreon account while filling a scanlation 
-request, to selling a print in Deviantart while reviewing the latest Doujinshi 
-on a not-so-free-of-ads-blog are some of the patchwork tasks of the comics 
-networked precariat in the age of semio-capitalism.
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Manouach, I. (2019). Peanuts minus Schulz: Distributed Labor as
-a Compositional Practice. The Comics Grid: Journal of comics scholarship, 9(16), 
-1–-21. \url{https://doi.org/10.16995/cg.139} \copyright{}
-\textit{2019 The Author(s). This is an open-access article distributed under the
-	terms of the Creative Commons Attribution 4.0 International License (CC-BY 
-	4.0), which permits unrestricted use, distribution, and reproduction in any 
-	medium, provided the original author and source are credited. See}
- \url{http://creativecommons.org/licenses/by/4.0/.}
-
-
-\subsubsection*{Paraphrasing in Vancouver style}
-
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Paraphrase, information prominent, IEEE 
-(2018) style
-
-\vspace{1ex}
-\noindent
-%\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-%% This is a trick to manually split the example over two pages.
-\textsf{\begin{longtable}{|p{\textwidth-4\fboxsep}|}
-\hline
-When a laser beam is scattered by a dielectric microparticle, resulting in light
-refraction on entering and leaving the particle, a small amount of momentum is 
-transferred from the photons to the matter. This change in momentum, known as 
-the gradient force, results in the attraction of the particle to the high 
-intensity part of the beam (usually the centre). Optical trapping of microscale 
-particles via this mechanism was first reported in the 1970s [1] and duly led to
-the initial observation of a single beam optical trap in 1986 [2]. These 
-preliminary experiments, and many of the methodologies that developed from them,
-utilized the gradient force\\ % spilt line manually by observation
-exerted by a single, tightly focused Gaussian laser 
-beam to trap particles in solution through what has become known as the “optical
-tweezer” effect. Since these initial findings, optical technology has evolved 
-significantly, and traps that facilitate three dimensional manipulation of 
-particles are now readily available. While originally limited to the controlled 
-manipulation of individual particles, multitrap setups involving either 
-splitting [3,4] or time sharing [5,6] with a single laser beam are now also 
-commonly utilized. As a more advanced form of the former, holographic optical 
-tweezers that employ diffractive optical elements such as spatial light 
-modulators now allow computer controlled, independent manipulation of multiple 
-particles [7--9]. A number of multitrap devices have also been developed based 
-on the application of laser beams with more complex phase and intensity 
-profiles, as for example Bessel or higher order Laguerre Gaussian beams 
-[10--12].\\
-\hline
-\end{longtable}
-}
-%}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} “Chirality in Optical Trapping and Optical Binding” by David S.
-Bradshaw, Kayn A. Forbes, Jamie M. Leeder, and David L. Andrews in 
-\textit{Photonics} 2015, available under a Creative Commons Attribution License 
-(\url{https://creativecommons.org/licenses/by/4.0/}) at 
-\url{https://doi.org/10.3390/photonics2020483}.
-
-\vspace{1ex}
-If you would like to emphasise the inventor, you could rephrase the first 
-in-text citation as “was first reported by Ashkin in 1970 [1]” or “was first 
-reported by Ashkin [1]” if the year is less important. (Ashkin is the sole 
-author of the paper. It was published in 1970.)
-
-
-\subsubsection*{Tips for paraphrasing}
-
-\begin{enumerate}
-	\item Identify the important points from the source text. Then, try to 
-	identify the relationship between these different parts. Is the relationship
-	sequential, causal, contrasting, or conditional? Can these be replaced by 
-	synonyms? For example, the contrasting conjunction, but, can be replaced by 
-	however, although, nevertheless, yet or on the other hand. In many cases, 
-	these synonyms may require that you change the structure of the sentence, 
-	which in turn may help you to formulate the ideas in your own words.
-	\item Synonyms - A word such as give can be replaced with provide, supply or
-	contribute. Refer to a thesaurus for more examples. You can find these 
-	online or at the Learning Centre. If you are unsure of how a new word might 
-	be used, check a dictionary or search the word in Google Scholar for 
-	examples of its use in context.
-	\item Common phrases - There are often multiple ways of expressing a given 
-	phrase in academic writing. For example, compare “Previous studies have not 
-	dealt with\ldots” with “Researchers have not treated X in much detail” or 
-	“Most studies in the field of X have only focused on\ldots” These examples 
-	were drawn from the University of Manchester’s (2018) Academic Phrasebank  (\url{http://www.phrasebank.manchester.ac.uk/}). This corpus of common 
-	phrases includes hundreds of examples, categorised according to their 
-	functions.
-	\item Additions or deletions - Can you add a missing item? Can you leave 
-	something out?
-	\item Change the structure of the sentence - There are many ways to change 
-	the structure. Can you change the sentence from passive voice to active 
-	voice, or vice versa? Can you rewrite the sentence with “It is” or “There 
-	is”? Can you switch to the inanimate agent, e.g. “This thesis discovered”? 
-	Refer to the Aalto University Language Centre site 
-	(\url{http://sana.aalto.fi/awe/}) in the “Cohesion” section for more ways to
-	change the structure of a sentence.
-\end{enumerate}
-
-\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} Before and After Paraphrase
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-\textbf{Before Paraphrase}\\
-“Significant progress has been made in the use of smart textiles in wearable 
-technology, especially in the sport and well-being sector. However, the medical 
-sector still lacks commercial and viable solutions” (Ilen et al., 2019, 
-p.~2).\\[1em]
-%
-\textbf{After Paraphrase}\\
-While some industries have taken advantage of smart textiles in wearable  
-technology, Ilen et al. (2019, p. 2) contend that the medical industry has yet 
-to produce any viable products.
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Ilen, E., Groth, G., Ahola, M., \& Niinimäki, K. (2019). 
-\textit{Empathy in a Technology Driven Design Process: Designing for Users 
-	without a Voice of their Own.} Paper presented at 8th biannual Nordic Design
-	Research Conference: Nordes 2019: Who Cares?, Espoo, Finland. Open Access 
-	paper.
-
-
-\subsubsection*{Avoiding the pitfalls of the Finnish paragraph-length paraphrase
-	 (FPP)}
-
-In Finland, there exists a method of citation that is not permitted or 
-recognised by many international style guides, including IEEE Reference Guide 
-(IEEE 2018); Information and documentation --- Guidelines for bibliographic 
-references and citations to information resources (ISO 690:2010(E)) (ISO 2010); 
-New Oxford Style Manual (OUP 2012); Scientific Style and Format: The CSE Manual 
-for Authors, Editors, and Publishers (CSE 2012); The Chicago Manual of Style 
-(University of Chicago Press 2017); The Publication Manual of the APA (APA 
-2018). Due to this and the reasons discussed below, it is not recommended that 
-this method be used when writing in English. Interestingly, the Finnish 
-Standards Association (Suomen Standardisoimisliitto SFS ry) which emulates the 
-ISO standard, does not recognise this either (FSA 2010). In the Finnish style of
-citation, writers can write an entire paragraph where every sentence comes from 
-a single source. Then, at the bottom of the paragraph, they provide a citation 
-in brackets outside the final punctuation (see example below). Generally, the 
-Finnish method suggests that by putting the citation after the period, the 
-citation then refers to all the sentences preceding it in the paragraph.
-
-\newpage %% Manually adjust palcement of the example
-%\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} \label{ex:Finn}Paraphrase, Finnish style,
-not recommended in English
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-Additive manufacturing was originally developed to guide product design by 
-providing a way to create prototypes directly from digital designs. This method 
-called rapid prototyping (RP), as the name implies, consumes less time and 
-resources than most preceding techniques. For instance, the manufacturing of an 
-injection mold for prototyping purposes would be extremely expensive. However, 
-the part can be created with additive manufacturing for a fraction of the cost. 
-Moreover, rapid prototyping is cost and time effective when it can substitute 
-handcrafting, CNC manufacturing, or silicon molding. The downside when compared 
-to these methods is often poor surface quality and inferior dimensional 
-accuracy. However, RP enables fast iterative testing of products with a low 
-threshold of prototypes failing expectations. This makes it a superior tool in 
-product development and explains why prototyping has been the leading 
-application of AM. (Wohlers 2013)
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Anonymous. (2015). Bachelor Thesis. Adapted from Anonymous, 
-Bachelor thesis, School of Engineering, Aalto University, Espoo Finland, 2015. 
-This work is licensed under an Attribution-NonCommercialNoDerivatives 4.0 
-International license.
-
-\vspace{1em}
-This style has several inherent problems. To begin with, it significantly limits
-the writer from utilising what the noted academic writing scholar Ken Hyland 
-(2005) has called stance and engagement within the actual paragraph. This is 
-where the writer adds their own authorial voice to the text by interacting with 
-the source material and with the readership in order to situate themselves in 
-their community of academic peers. This interaction is achieved in the context 
-of stance and engagement by the use of attitudinal markers, boosting, hedging, 
-self-mentioning, directives, personal asides, questions, reader pronouns, and 
-shared knowledge (Hyland 2005, 177). Within this long form Finnish paraphrase, 
-the stance and engagement can logically be attributed only to the original cited
-source, not the current writer summarising the ideas of the source, for there is
-no meaningful way to discern ownership of ideas beyond the citation attribution.
-In example~\ref{ex:Finn} above, it is possible to identify at least 10 separate 
-statements made in the paragraph. Some of these are representative of stance, 
-including claims (e.g., ‘The downside when compared to these methods is\ldots’ 
-and ‘This makes it a superior tool\ldots and explains why prototyping has been 
-the leading application in AM’) and logical connections (‘Moreover’, and 
-‘However’). Moreover, there are clear attempts at engagement with asides (e.g., 
-‘as the names implies’) and creating interpersonal solidarity with experts in 
-the field through boosting (e.g., ‘extremely’ and ‘superior’). While some of 
-these may have been the thesis writer’s own arguments, it would, for the reader,
-appear that these have all been paraphrased from the source (Wohlers 2013). From
-a larger perspective, this Finnish paraphrase style tends to promote a less 
-critical style of writing where writers tend to summarise the work of others and
-avoid critically discussing individual ideas from sources as they are 
-introduced.
-
-Similarly, this Finnish paraphrase style can lead fledgling writers quite easily
-into practices that constitute plagiarism. For instance, when students write 
-their bachelor’s thesis, it can often take the form of a literature review. When 
-the perceived goal is to summarise others’ ideas, it can readily lead to an 
-overuse of this FPP style. According to the Chicago Manual of Style, this could 
-constitute plagiarism: ‘(u)se that is not fair will not be excused by 
-paraphrasing. Traditional copyright doctrine treats extensive paraphrase as 
-merely disguised copying’ (University of Chicago Press 2017, 212). It is similar
-to the problem of overuse of block quotes in the arts, humanities, and social 
-sciences.
-
-Worse yet, the logic of the FPP style has led some students to the practice of 
-summarising two or more sources into a single paragraph with the citations 
-provided only at the end of the paragraph. This would certainly constitute 
-plagiarism as there is no meaningful way for the reader to discern which idea or
-argument belongs to which author. Unfortunately, this logical leap does not 
-appear to be a rare occurrence. In a recent survey of 41 theses written in 
-English at Aalto University between 2008 and 2018, 85\% (35 samples) used the 
-FPP style, while the multiple citation problem occurred in 41\% (17 samples) 
-(Forget and Paloposki 2019).
-
-While it is generally better to introduce a citation and immediately 
-contextualise it (i.e., integrate it into your argumentation; explain its 
-significance; agree/disagree with it; or contrast it), it is possible to 
-continue discussing a single source without using the same citation at the end 
-of every sentence. For instance, the Publication Manual of the APA (APA 2018) 
-recommends maintaining a clear progression of the topic at the start of the next
-sentence.
-
-\vspace{1em}
-\noindent
-\refstepcounter{example}
-\textsf{\textbf{Example~\theexample:}} \label{ex:apa}APA-recommended method of 
-paraphrasing same source across consecutive sentences 
-
-\vspace{1ex}
-\noindent
-\fbox{\parbox{\textwidth-2\fboxsep}{\textsf{
-Chen and Liu (2004) studied the effect of aggregate size distributions and the 
-volume fraction of aggregate on the fracture parameters of concretes with 
-strength 50--89 MPa under three-point bending test. For this purpose three 
-various maximum aggregate sizes of 10, 15 and 20 mm were employed.
-}}}
-
-\vspace{1ex}
-\noindent
-\textit{Source:} Rashad, A. and Seleem, H. (2014). A Study of High Strength 
-Concrete with Moderate Cement Content Incorporating Limestone Powder. 
-\textit{Building Re-search Journal}, 61(1): 43--58. 
-DOI \url{https://doi.org/10.2478/brj-2014-0004}. 
-This work is licensed under a Creative Commons 
-Attribution-NonCommercial-NoDerivatives 3.0 International license.
-
-\vspace{1em}
-In example \ref{ex:apa}, it is clear the Rashad and Seleem are still referring 
-to Chen and Liu’s article in the second sentence by starting with ‘For this 
-purpose\ldots aggregate sizes\ldots’ Although one would suffice, both noun 
-phrases are clearly connected by topical progression to the narrative of the 
-first sentence.
-
-
-\subsection*{References}
-\subsubsection*{References in the Harvard Style}
-
-The reference list below contains examples of a scholarly article, book, chapter
-in a book with editors, conference publication, doctoral dissertation, 
-interview, master’s thesis, motion picture, painting, photograph, standard and 
-webpage. These have been formatted in the American Psychological Association 
-(APA) style, one variation of the Harvard Style. Please note that the APA 
-recommends including the digital object identifier (DOI) for sources found 
-online. When the DOI is missing, they recommend including the home page URL. 
-Although the APA guidelines do not require a date of retrieval, it is good 
-practice to note the date retrieved as online sources can change over time.
-
-\vspace{1ex}
-\noindent
-American Medical Association. (2007). 
-\textit{AMA Manual of Style: A Guide for Authors and Editors} 
-(10th ed.). New York, USA: Oxford University Press.
-
-\vspace{1ex}
-\noindent
-American Psychological Association. (2018). 
-\textit{Publication Manual of the American Psychological Association} 
-(6th ed.). Washington, USA: American Psychological Association.
-
-\vspace{1ex}
-\noindent
-American Sociological Association. (2019). 
-\textit{American Sociological Association Style Guide} 
-(6th ed.). Washington, USA: American Sociological Association.
-
-\vspace{1ex}
-\noindent
-British Medical Association. (2012). 
-Reference Styles [Webpage]. Updated 28 February 2019. 
-Retrieved 01 March 2020 from 
-\url{https://www.bma.org.uk/library/library-guide/reference-styles}
-
-\vspace{1ex}
-\noindent
-Bruce, E. \& Hamp-Lyons, L. (2013). 
-Looking for the academic voice: Assessing undergraduate writing. 
-In J. Wrigglesworth (Ed.), 
-\textit{EAP within the higher education garden: Cross-pollination between 
-	disciplines, departments and research}. 
-Proceedings of the BALEAP Conference, Portsmouth, UK, 2011. Reading, UK: Garnet
-Education.
-
-\vspace{1ex}
-\noindent
-Chernin, E. (1988). 
-The “Harvard System”: a mystery dispelled, \textit{BMJ}, 297(6655): 1062--1063.
-
-\vspace{1ex}
-\noindent
-Council of Science Editors. (2012). 
-\textit{Scientific Style and Format: The CSE Manual for Authors, Editors, and
-	Publishers}. 
-Chicago, USA: University of Chicago Press.
-
-\vspace{1ex}
-\noindent
-Finnish Standards Association. (2010). SFS 5989, Guidelines for bibliographic 
-references and citations to information sources. Helsinki, Finland: Finnish 
-Standards Association.
-
-\vspace{1ex}
-\noindent
-Forget, M. and Paloposki, T. (2019). 
-\textit{When academic writing cultures collide: Plagiarism requirements in the 
-	English Thesis Seminar at Aalto University}. 
-Paper presented at 3rd International Seminar English as a Medium of Instruction 
-(EMI): embracing pluricultural education, Valencia, Spain.
-
-\vspace{1ex}
-\noindent
-Halliday, M. (2013). \textit{Halliday’s Introduction to Functional Grammar} 
-(4th ed.). London, UK: Routledge.
-
-\vspace{1ex}
-\noindent
-Heo, M. and Lee, M. (Producers), \& Joon-Ho, B. (Director). (2019). 
-\textit{Parasite} [Motion Picture]. South Korea: CJ Entertainment.
-
-\vspace{1ex}
-\noindent
-Hyland, K. (2005). 
-Stance and engagement: a model of interaction in academic discourse, 
-\textit{Discourse Studies}, 7(2), 173--192. 
-\url{doi.org/10.1177/1461445605050365}
-
-\vspace{1ex}
-\noindent
-Ilen, E., Groth, G., Ahola, M., \& Niinimäki, K. (2019). 
-\textit{Empathy in a Technology Driven Design Process: Designing for Users 
-	without a Voice of their Own}. 
-Paper presented at 8th biannual Nordic Design Research Conference: Nordes 2019: 
-Who Cares?, Espoo, Finland.
-
-\vspace{1ex}
-\noindent
-International Organization for Standardization. (2010). 
-\textit{Information and documentation -- Guidelines for bibliographic references
-	and citations to information resources} 
-(ISO 690:2010(E)) (3rd ed.). Retrieved 01 March 2020 from 
-\url{https://www.iso.org/standard/43320.html}
-
-\vspace{1ex}
-\noindent
-Lu, Y. (2018). 
-\textit{Experience goals in designing professional tools: evoking meaningful 
-	experiences at work} 
-(Doctoral Dissertation, Aalto University, Espoo, Finland). 
-Retrieved 1 March 2020 from 
-\url{https://aaltodoc.aalto.fi/handle/123456789/34084} 
-Modern Language Association. (2016). MLA Handbook. New York, USA: Modern 
-Language Association.
-
-\vspace{1ex}
-\noindent
-Nixon, R. (1977, May 4). Interview by D. Frost (Video recording). 
-David Paradine Productions Ltd., Hertfordshire, U.K.
-
-\vspace{1ex}
-\noindent
-Oxford University Press. (2012). 
-\textit{New Oxford Style Manual}. Oxford, UK: Oxford University Press.
-
-\vspace{1ex}
-\noindent
-Patrias, K. (2007). 
-\textit{Citing medicine: the NLM style guide for authors, editors, and 
-	publishers} 
-(2nd ed.). Bethesda, USA: National Library of Medicine (US). 
-Retrieved 1 March 2020 from: \url{http://www.nlm.nih.gov/citingmedicine}
-
-\vspace{1ex}
-\noindent
-Sutherland-Smith, W. (2019). Is student plagiarism still a serious problem in 
-universities today? In D. Pecorari \& P. Shaw (Eds.), 
-\textit{Student Plagiarism in Higher Education} (pp. 47--61). 
-Oxford, UK: Routledge.
-
-\vspace{1ex}
-\noindent
-Tutal, E. (2015). 
-\textit{Participatory design of visual product identity concepts} 
-(Master’s thesis, Aalto University, Espoo, Finland). 
-Retrieved 1 March 2020 from \url{https://aaltodoc.aalto.fi/}
-
-\vspace{1ex}
-\noindent
-Unknown. (1904). \textit{Alexander Graham Bell} [Photograph]. 
-Library of Congress Prints and Photographs Division, Washington, U.S.A.
-
-\vspace{1ex}
-\noindent
-University of Chicago Press. (2017). \textit{The Chicago Manual of Style} 
-(17th ed.). Chicago, USA: University of Chicago Press.
-
-\vspace{1ex}
-\noindent
-University of Manchester. (2018). Academic Phrasebank [Webpage]. 
-Retrieved 1 March 2020 from \url{http://www.phrasebank.manchester.ac.uk/}
-
-\vspace{1ex}
-\noindent
-Van Gogh, V. (1889). \textit{Sunflowers} [Oil on canvas]. 
-Van Gogh Museum, Vincent Van Gogh Foundation, Amsterdam, The Netherlands.
-
-
-\subsubsection*{References in the Vancouver (IEEE) style}
-
-The reference list below contains examples of scholarly articles [1, 2], a book 
-[3], a chapter in a book with editors [4], a conference publication [5], a 
-master’s thesis [6], a doctoral dissertation [7], a standard [8] and a webpage 
-[9]. Note that the IEEE style allows DOIs, but does not require them. For online
-references, you should specify the ‘accessed date’ if it is a webpage that might
-change. Scholarly articles and theses should not change, and thus the access 
-date is not important for such references. Today, some periodicals use article 
-numbers [2] instead of ordinary page numbers [1]. Please see [10] for more 
-details.
-
-Referring to interviews or works of art seems very uncommon using the IEEE style
-and the guide [10] does not mention such references at all.
-
-\begin{itemize}
-\item[{[1]}] J. B. Pendry, “Negative refraction makes a perfect lens,” 
-\textit{Phys. Rev. Lett.}, vol. 85, no. 18, pp. 3966--3969, Oct. 2000, 
-doi: 10.1103/PhysRevLett.85.3966.
-\item[{[2]}] J. Chen, S. Cheng, H. Xie, L. Wang, and T. Xiang, 
-“Equivalence of restricted Boltzmann machines and tensor network states,” 
-\textit{Phys. Rev. B}, vol. 97, no. 8, 2018, Art. no. 085104, 
-doi: 10.1103/PhysRevB.97.085104.
-\item[{[3]}] C. F. Bohren and D. R. Huffman, 
-\textit{Absorption and Scattering of Light by Small Particles}, 
-Weinheim, Germany: Wiley-VCH, 2004.
-\item[{[4]}] V. Yannopapas, A. G. Vanakaras, and D. J. Photinos, 
-“Electrodynamic theory of three-dimensional metamaterials of hierarchically 
-organized nanoparticles,” 
-in \textit{Amorphous Nanophotonics}, C. Rockstuhl and T. Scharf, Eds., 
-Berlin Heidelberg, Germany: Springer, 2013, pp. 119--141.
-\item[{[5]}] T. Joachims, “Optimizing search engines using clickthrough data,” 
-in \textit{Proc. 8th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining}, 
-Edmonton, Canada, Jul. 23--26, 2002, pp. 133--142.
-\item[{[6]}] J. Martela, “Lifecycle of Mobile Phones,” M.Sc. thesis, 
-Dept. Materials Science and Engineering, Aalto University, Espoo, Finland, 2019. 
-[Online]. Available: \url{http://urn.fi/URN:NBN:fi:aalto-201908254898} 
-\item[{[7]}] R.J. Garbacz, 
-“A generalized expansion for radiated and scattered fields,” Ph.D. dissertation, 
-ElectroScience Lab., Ohio State Univ., USA, 1968. [Online]. Available: 
-\url{http://rave.ohiolink.edu/etdc/view?acc_num=osu1302723653}
-\item[{[8]}] \textit{Simple Mail Transfer Protocol}, RFC 5321, J. Klensin, 
-Oct. 2008, [Online]. Available: \url{https://tools.ietf.org/html/rfc5321}
-\item[{[9]}] B. Casselman, “Jacob Bernoulli's zoo,” AMS feature column, 
-\url{http://www.ams.org/publicoutreach/feature-column/fc-2018-02} 
-(accessed Feb. 6, 2018).
-\item[{[10]}] IEEE, “IEEE Reference Guide,” 2018. [Online]. Available: 
-\url{https://ieeeauthorcenter.ieee.org/wp-content/uploads/IEEE-Reference-Guide.pdf}
-\end{itemize}
 
 \end{document}

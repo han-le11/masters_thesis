@@ -1,42 +1,275 @@
+%% MCP official document and specification
+%% ----------------------------------------
 
-    
-@Online{aaltolib,
-  author  = {{Aalto University Learning Centre}}, % extra braces because firstinit is true in document
-  journal = {NPSG.UW - Natural Phenomena Simulation Group at University of Waterloo},
-  title   = {Citation Guide: Making a bibliography},
-  url     = {https://libguides.aalto.fi/c.php?g=410674&p=2797572},
-  urldate = {2021-07-14}
+@misc{anthropic_mcp_intro,
+  author       = {{Anthropic}},
+  title        = {{What is the Model Context Protocol (MCP)?}},
+  howpublished = {Official MCP Documentation},
+  year         = {2024},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/getting-started/intro}.
+                  (Accessed: 9 Jun 2026)},
+}
+ 
+@misc{mcp_architecture,
+  author       = {{Model Context Protocol}},
+  title        = {{Model Context Protocol Architecture}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.info/specification/draft/architecture/}.
+                  (Accessed: 27 Jul 2026)},
+}
+ 
+@misc{mcpspec2026,
+  author       = {{Anthropic}},
+  title        = {{Architecture Overview --- Model Context Protocol}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/learn/architecture}.
+                  (Accessed: 22 Jul 2026)},
+}
+ 
+@misc{mcpclient2026,
+  author       = {{Anthropic}},
+  title        = {{Understanding MCP clients}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/2026-07-28/learn/client-concepts}.
+                  (Accessed: 27 Jul 2026)},
+}
+ 
+@misc{mcp_authorization_2025,
+  author       = {{Anthropic}},
+  title        = {{Model Context Protocol Authorization}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2025},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization}.
+                  (Accessed: 3 Aug 2026)},
+}
+ 
+@misc{jsonrpc2020,
+  author       = {{JSON-RPC Working Group}},
+  title        = {{JSON-RPC 2.0 Specification}},
+  howpublished = {JSON-RPC Working Group},
+  year         = {2010},
+  note         = {[Online]. Available:
+                  \url{https://www.jsonrpc.org/specification}.
+                  (Accessed: 27 Jul 2026)},
 }
 
-
-@Book{Bringhurst,
-  author    = {Bringhurst, R.},
-  publisher = {Point Roberts, WA: Hartley \& Marks},
-  title     = {Horizontal Motion. The Elements of Typographic Style},
-  year      = {1992},
-  pages = {26, 25--36},
-  url = {https://smallpressblog.files.wordpress.com/2017/11/bringhurstelementsselections1.pdf}
+%% --------------------------------------------------
+%% MCP ecosystem: Server implementations & registries
+%% --------------------------------------------------
+ 
+@misc{google_calendar_mcp,
+  author       = {{Google}},
+  title        = {{Configure the Calendar MCP Server}},
+  howpublished = {Google Workspace for Developers},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://developers.google.com/workspace/calendar/api/guides/configure-mcp-server}.
+                  (Accessed: 9 Jun 2026)},
 }
-    
-   
-@article{Dyson, 
-    title=      {The Effects of Line Length and Method of Movement on Patterns of Reading from Screen}, 
-    volume=     {2}, 
-    number=     {2}, 
-    journal=    {Visible Language}, 
-    author=     {Dyson, M. C. and Kipping, G. J.}, 
-    year=       {1998}, 
-    month=      {3}, 
-    pages=      {150--181}}
-
-@Online{Wikilinelength,
-    title =     {Line length},
-    author =    {{Wikipedia contributors}},
-    journal =   {{Wikipedia: The Free Encyclopedia}, Wikimedia Foundation, Inc.},
-    date =   {2004-07-22},
-	url = {https://en.wikipedia.org/w/index.php?title=Line_length&oldid=997524503},
-	urldate = {2021-05-07}
+ 
+@misc{github-mcp-server,
+  author       = {{GitHub}},
+  title        = {{GitHub MCP Server}},
+  howpublished = {GitHub repository},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://github.com/github/github-mcp-server}.
+                  (Accessed: 16 Jun 2026)},
+}
+ 
+@misc{figma-mcp,
+  author       = {{Figma}},
+  title        = {{Design context everywhere you build}},
+  howpublished = {Figma Blog},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://www.figma.com/blog/design-context-everywhere-you-build/}.
+                  (Accessed: 16 Jun 2026)},
+}
+ 
+@misc{glama_mcp_servers_2026,
+  author       = {{Glama AI}},
+  title        = {{Open-Source MCP Servers}},
+  howpublished = {Glama},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://glama.ai/mcp/servers}.
+                  (Accessed: 16 Jun 2026)},
 }
 
+@misc{fastmcp_openapi2026,
+  author       = {{FastMCP}},
+  title        = {{OpenAPI Integration --- FastMCP}},
+  howpublished = {FastMCP Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://gofastmcp.com/integrations/openapi}.
+                  (Accessed: 6 Aug 2026)},
+}
 
-@Comment{jabref-meta: databaseType:bibtex;}
+%% -------------------------------
+%% MCP surveys & landscape studies
+%% -------------------------------
+ 
+%% Preprint, not peer reviewed. Hosted on TechRxiv (NOT Authorea --
+%% Authorea only lists the author's profile page for this work).
+@misc{ray2025survey,
+  author       = {Ray, Partha Pratim},
+  title        = {{A survey on model context protocol: Architecture, state-of-the-art, challenges and future directions}},
+  howpublished = {TechRxiv},
+  year         = {2025},
+  month        = {Apr},
+  doi          = {10.36227/techrxiv.174495492.22752319/v1}
+}
+ 
+%% Preprint, not peer reviewed at time of citation.
+@misc{hou2025landscape,
+  author        = {Hou, Xinyi and Zhao, Yanjie and Wang, Shenao and Wang, Haoyu},
+  title         = {{Model Context Protocol (MCP): Landscape, Security Threats, and Future Research Directions}},
+  year          = {2025},
+  month         = {Mar},
+  eprint        = {2503.23278},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR}
+}
+ 
+%% -----------------------
+%% MCP security 
+%% -----------------------
+ 
+%% Preprint, not peer reviewed at time of citation.
+@misc{yan2025mcpmisuse,
+  author        = {Yan, Biwei and Zhang, Yue and Xu, Minghui and Wu, Hao and Zhang, Yechao and Li, Kun and Zhang, Guoming and Cheng, Xiuzhen},
+  title         = {{"MCP Does Not Stand for Misuse Cryptography Protocol": Uncovering Cryptographic Misuse in Model Context Protocol at Scale}},
+  year          = {2025},
+  month         = {Dec},
+  eprint        = {2512.03775},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR}
+}
+ 
+%% Preprint, not peer reviewed at time of citation.
+@misc{narajala2025enterprise,
+  author        = {Narajala, Vineeth Sai and Habler, Idan},
+  title         = {{Enterprise-Grade Security for the Model Context Protocol (MCP): Frameworks and Mitigation Strategies}},
+  year          = {2025},
+  eprint        = {2504.08623},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR}
+}
+ 
+%% Accepted/published at ACM TOSEM (DOI 10.1145/3814959) -- cite this
+%% journal entry rather than the CoRR/arXiv:2506.13538 preprint.
+@article{hasan2025mcp,
+  author  = {Hasan, Mohammed Mehedi and Li, Hao and Fallahzadeh, Emad and Rajbahadur, Gopi Krishnan and Adams, Bram and Hassan, Ahmed E.},
+  title   = {{Model Context Protocol (MCP) at First Glance: Studying the Security and Maintainability of MCP Servers}},
+  journal = {ACM Transactions on Software Engineering and Methodology},
+  year    = {2026},
+  doi     = {10.1145/3814959}
+}
+ 
+%% Preprint; reportedly accepted at AAAI 2026 per citing literature --
+%% confirm final venue/page numbers before submission.
+@misc{wang2026mcptox,
+  author        = {Wang, Zhiqiang and Gao, Yichao and Wang, Yanting and Liu, Suyuan and Sun, Haifeng and Cheng, Haoran and Shi, Guanquan and Du, Haohua and Li, Xiangyang},
+  title         = {{MCPTox: A Benchmark for Tool Poisoning Attack on Real-World MCP Servers}},
+  year          = {2025},
+  month         = {Aug},
+  eprint        = {2508.14925},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR}
+}
+ 
+%% Peer-reviewed, published 21 May 2026 (MDPI Electronics, Special Issue:
+%% Cryptography and Computer Security, 2nd Edition). Verified against
+%% publisher record.
+@article{park2026attack,
+  author  = {Park, Jinwoo and Kim, Geonhee and Lee, Hyeokjae and Park, Jeman},
+  title   = {{Beyond Tool Poisoning: Attack Surfaces of Malicious Remote MCP Servers Across LLM Platforms}},
+  journal = {Electronics},
+  volume  = {15},
+  number  = {10},
+  pages   = {2214},
+  year    = {2026},
+  doi     = {10.3390/electronics15102214}
+}
+ 
+%% Vendor blog post -- Descope sells MCP auth/identity products, so treat
+%% as an industry perspective rather than a neutral academic source.
+@misc{descope2025enterprise,
+  author       = {{Descope}},
+  title        = {{5 Enterprise Challenges in Deploying Remote MCP Servers}},
+  howpublished = {Descope Blog},
+  year         = {2025},
+  url          = {https://www.descope.com/blog/post/enterprise-mcp},
+  urldate      = {2026-07-22}
+}
+ 
+%% CHECK RELEVANCE: this paper concerns GenAI usage-policy privacy/security
+%% in higher education, not MCP specifically. Confirm this is the citation
+%% you intended before using it in an MCP-related section.
+@misc{ng2025security,
+  author        = {Ng, Bei Yi and Li, Jiarui and Tong, Xinyuan and Ye, Kevin and Yenne, Gauthami and Chandrasekaran, Varun and Li, Jingjie},
+  title         = {{Analyzing Security and Privacy Challenges in Generative AI Usage Guidelines for Higher Education}},
+  year          = {2025},
+  month         = {Jun},
+  eprint        = {2506.20463},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.HC}
+}
+ 
+%% --------------------
+%% Research methodology
+%% --------------------
+
+%% Original work
+@article{hevner2004design,
+  title={{Design science in information systems research}},
+  author={Hevner, Alan R and March, Salvatore T and Park, Jinsoo and Ram, Sudha},
+  journal={MIS quarterly},
+  volume={28},
+  number={1},
+  pages={75--106},
+  year={2004},
+  publisher={Management Information Systems Research Center, University of Minnesota}
+}
+
+%% Proposed framework/guideline of 6 steps
+@article{peffers2007design,
+  title={{A design science research methodology for information systems research}},
+  author={Peffers, Ken and Tuunanen, Tuure and Rothenberger, Marcus A and Chatterjee, Samir},
+  journal={Journal of management information systems},
+  volume={24},
+  number={3},
+  pages={45--77},
+  year={2007},
+  publisher={Taylor \& Francis}
+}
+
+%% -----------------------------------
+%% Aalto University AI context
+%% -----------------------------------
+
+@misc{aalto_ai_assistant,
+  author  = {{Aalto University}},
+  title   = {{Aalto AI Assistant}},
+  year    = {2026},
+  url     = {https://www.aalto.fi/en/services/aalto-ai-assistant},
+  urldate = {2026-06-09}
+}
+
+@misc{aalto_llm_gateway,
+  author       = {{Aalto University IT Services}},
+  title        = {{Local LLM Gateway}},
+  howpublished = {\url{https://www.aalto.fi/en/services/local-llm-gateway}},
+  note         = {Updated: 10 Feb.\ 2026, Accessed: 29 Jul.\ 2026},
+  year         = {2026}
+}
