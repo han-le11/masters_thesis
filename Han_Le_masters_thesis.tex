@@ -535,7 +535,7 @@ I want to thank Professor Bo Zhao and my advisors Joonas Uusnäkki and Zheyue Ta
 Otaniemi, 28 September 2026\\
 
 \vspace{5mm}
-{\hfill Han Le \hspace{1cm}}
+{\hfill Hân Lê \hspace{1cm}}
 
 %% Force a new page after the preface
 %%
@@ -577,7 +577,7 @@ Otaniemi, 28 September 2026\\
 AI          & Artificial Intelligence \\
 MCP         & Model Context Protocol \\
 LLM         & Large Language Model \\
-
+RQ          & Research Question \\
 \end{tabular}
 
 
@@ -592,55 +592,57 @@ LLM         & Large Language Model \\
 \section{Introduction}
 \label{chap:intro}
 % ============================================================
-%% Leave page number of the first page empty
+%% 
 %% 
 \thispagestyle{empty}
 
-Large language models (LLMs) are rapidly integrated into production systems and connected to external tools, data sources, and services. 
-This adoption has brought about the new paradigm of agentic systems—these modern autonomous software systems utilize LLMs and other machine learning algorithms to perceive the user's prompt, decide on the best approach, take actions using available tools, and learn from the results.
-This paradigm shift of AI's capabilities from passive text generation to active tool use demands a robust, standardized framework in how AI is deployed and how to control AI's communication with external resources securely.
+The limitation of large language models (LLMs) is that their knowledge is restricted to their training data and context window.
+If a user asks an LLM about information that is not in the model's knowledge, such as a Google calendar event or a file, the LLM cannot answer or just makes things up. 
+This restriction of LLMs has brought about a new paradigm of agentic software systems, shifting AI's capabilities from passive text generation to active tool use.
+AI applications, powered by LLMs in their core, are connected to external tools — be they databases, web contents, or local files — to bring external data to the context window of LLMs. 
+Modern autonomous software systems utilize LLMs and other machine learning algorithms to perceive the user's prompt, decide on the best approach, take actions by using tools and information available to them, and learn from user feedback.
+However, as the number of AI applications and external tools increases, the integration problem grows quadratically, as known as the \textit{N$\times$M} integration problem \cite{ray2025survey}. 
+Without a shared interface, every \textit{M} number of AI applications requires a bespoke integration for every \textit{N} external tool that it integrates. 
+Therefore, AI applications need a robust framework to solve the explosion of \textit{N$\times$M} integrations and to standardize the communication of LLMs with external resources.
 
-As a result, the Model Context Protocol (MCP), introduced by Anthropic in November 2024, has emerged as a middleware layer that standardizes how AI agents connect with external systems and interact with the world beyond the training data of their LLMs \cite{anthropic_mcp_intro}.
-MCP introduces an interface through which LLMs can find, invoke, and interact with external tools, databases, and APIs through a unified communication layer based on the JSON-RPC protocol \cite{hou2025landscape}.
-From the point of view of scalability, MCP aims to solve the bottleneck of the \textit{N$\times$M integration problem}, which occurs when there are \textit{M} number of AI models that need to connect to \textit{N} external tools or data sources \cite{ray2025survey}. 
-Without MCP, each model requires a bespoke integration for each external tool or data source that it interacts with, turning this into the \textit{N$\times$M integration problem}. 
-Thanks to MCP, the AI model's reasoning is separated from tool execution, which enables a robust, scalable architecture in which new tools can be added without modifying the underlying agentic pipeline. 
-As a result, MCP are rapidly adopted by industry vendors within months of its release, including Google, GitHub, and Figma.
-For example, Google Calendar has offered an MCP server that allows AI agents to access Google Calendar data and acts as a customized AI assistant to check availability or create and update events \cite{google_calendar_mcp}.
-GitHub MCP server allows AI assistants to perform common GitHub operations such as read code repositories, manage issues and pull requests, and retrieve file contents \cite{github-mcp-server}.
+As a result, the Model Context Protocol (MCP), introduced by Anthropic in November 2024, has emerged as a middleware layer that standardizes how AI agents connect to external systems and interact with the world beyond the training data of their LLMs \cite{anthropic_mcp_intro}.
+MCP defines a unified communication layer, based on the JSON-RPC 2.0 protocol \cite{jsonrpc2020}, through which LLMs can discover, invoke, and interact with external tools and resources, such as databases, files, and APIs.
+From the point of view of scalability, MCP aims to solve the bottleneck of the \textit{N$\times$M} integration problem \cite{ray2025survey}.
+In MCP architecture, the LLM's reasoning is separated from tool execution, so that new tools can be added to the MCP-based production system without modifying the underlying agentic pipeline. 
+As a result, within months of its release, MCP is rapidly adopted by industry vendors, including Google, GitHub, and Figma.
+Google's MCP server ecosystem spans multiple first-party remote servers hosted on Google infrastructure, covering both Google Cloud products and consumer- or developer-facing Google services, including a dedicated set of Google Workspace MCP servers for Drive, Gmail, and Calendar \cite{google_mcp2026}.
+For example, Google Calendar MCP server allows AI agents to access a consented user's Google Calendar data and acts as an AI assistant to check availability or create and update events \cite{google_calendar_mcp}.
+The GitHub MCP server allows AI assistants to perform common GitHub operations as a developer, such as reading code repositories, managing issues and pull requests, and retrieving file contents \cite{github-mcp-server}.
+Figma MCP server bridges the gap between design and production by feeding layout data directly to AI coding tools. 
 By June 2026, the MCP ecosystem is estimated to have grown to over 17,000 MCP servers, ranging from community-developed to enterprise-grade MCP servers \cite{glama_mcp_servers_2026}. 
 
 % problems
-However, at the same time, this rapid adoption of MCP has exposed critical gaps in the security and infrastructure to connect AI agents to external resources. 
-Currently, MCP provides only minimal built-in security guaranties by enforcing basic JSON schema validation and request traceability.
-It does not offer native support for authentication or confidentiality; therefore, the burden of securing tool interactions falls largely on individual developers \cite{yan2025mcpmisuse}. 
-This has led to multiple cybersecurity threats, including malicious prompt injection and MCP servers, cryptographic misuse, and insufficient access control mechanisms in the MCP ecosystem. 
-Furthermore, deploying MCP at organizational scale introduces additional challenges in scalability, multi-tenancy, and trust. 
+However, the rapid adoption of MCP has exposed critical security and infrastructure gaps to connect AI agents to external resources. 
+MCP does not offer native support for authentication or confidentiality; therefore, the burden of securing tool interactions is greatly dependent on individual developers \cite{yan2025mcpmisuse}. 
+This has led to multiple cybersecurity threats, including prompt injection and malicious MCP servers, cryptographic misuse, and insufficient access control mechanisms in the MCP ecosystem. 
 This issue is especially critical in the production systems of higher education institutions such as universities, where sensitive personal data, identity-bound services, and critical workflows are involved. 
 
 % research questions and the sub-problems in the line of inquiry
-The thesis addresses the research gap by proposing an MCP integration framework for GenAI systems in university contexts.
-The framework is developed and validated through a case for Aalto AI Assistant \cite{aalto_ai_assistant}, a chat-based assistant tool for internal users at Aalto University based in Espoo, Finland.
-Specifically, we integrate into Aalto AI Assistant's production system a service called AI Tutor.
-
-This thesis is carried out as a project at Aalto University IT Services (Aalto ITS), and Aalto AI Assistant serves as the primary case study, providing a real production environment in which to design, implement, and evaluate the proposed \UniMCP, an MCP Integration Framework.
-
-The thesis focuses on answering two main research questions: 
+The thesis addresses the research gap by proposing, designing, and implementing \UniMCP, a standardized MCP integration framework for GenAI production systems in universities focusing on security.
+The thesis focuses on answering three research questions: 
 \begin{enumerate}
-    \item How can MCP be securely integrated into a GenAI production system for university use?
-    \item How can a scalable MCP framework be designed and implemented within a university's GenAI production system?
+    \item \textbf{What are the main security threats when integrating MCP into a production-level university GenAI system?}
+    \item \textbf{How can a secure MCP integration layer can be design to mitigate these issues?}
+    \item \textbf{How effective is the proposed system?}
     %\item Is it possible to evaluate the trustworthiness of an MCP agent operating within a university's GenAI system?
 \end{enumerate}
 
 % the scope and constraints of the study along with the goals and main concepts involved.
-To answer these questions, this thesis studies the MCP architecture, identifies security and scalability challenges associated with MCP-based integration, and designs an MCP integration framework for university contexts. 
-The main contribution of the thesis is \UniMCP, a practical framework for integrating MCP into GenAI production systems in university environments. 
-The framework is named \UniMCP as the thesis project is conducted at Aalto University IT Services, and its design is motivated by the systems, environment, and use cases of Aalto University. 
-The framework is developed and evaluated through a case study of Aalto AI Assistant \cite{aalto_ai_assistant}, a GenAI-based assistant tool for internal users at Aalto University in Espoo, Finland. 
+% What each chapter in the thesis is about.
+To answer these questions, this thesis studies the MCP architecture in Chapter \ref{chap:mcp_background} and identifies three layers of challenges associated with MCP in Chapter \ref{chap:challenges}. 
+Chapter \ref{chap:requirements} derives the requirements for \UniMCP, and Chapter~\ref{chap:design} presents the framework's guiding principles and high-level architecture.
 
-As a proof of concept, the \UniMCP is validated through the development of \aitutor, a student-facing AI agent embedded in Aalto AI Assistant, to validate the proposed framework in a concrete university use case. The evaluation focuses on integration security, scalability, and trustworthiness, corresponding to the three research questions. More broadly, the thesis provides lessons for universities seeking to adopt tool-using GenAI assistants while maintaining security, scalability, privacy, and reliability.
+This thesis is carried out as a project at the IT Services of \aalto (Aalto ITS), a university based in Espoo, Finland.
+Aalto AI Assistant, a chat-based assistant for internal users at Aalto University \cite{aalto_ai_assistant}, serves as both the case study and the MCP host, providing a real-world production environment in which to design, implement, and evaluate \UniMCP in a real-life use case. 
+Specifically, Chapter~\ref{chap:implementation} integrates AI Tutor into Aalto AI Assistant's production system as an implementation of the \UniMCP framework; \aitutor is a student-facing AI agent that grounds \UniMCP in a concrete university use case.  
+Chapter \ref{chap:evaluation} then evaluates this implementation corresponding to the research questions above.
+Finally, Chapter \ref{chap:conclusion} summarizes the thesis's contributions, discusses limitations, and distills lessons for universities seeking to adopt tool-using GenAI assistants while maintaining security, scalability, and reliability.
 
-% What each chapter in the thesis is about
 
 
 %% In a thesis, every section/chapter starts a new page, hence the \clearpage
@@ -655,237 +657,364 @@ This chapter studies the background, core architectural components, and workflow
 In addition, current landscape of the MCP ecosystem is analyzed by studying MCP adoption and use cases relevant to the field of higher education.
 
 \subsection{Overview of Model Context Protocol}
-% Explain what MCP is.
-It is important to first understand the big picture of Model Context Protocol (MCP).
-Introduced by Anthropic in November 2024, MCP is an open-source standard that defines how an AI application exchanges context with external tools and data sources through a uniform interface, rather than through bespoke, tool-specific integration code \cite{anthropic_mcp_intro}.
-% Why it was introduced
-Hence, MCP can reduce custom code for every AI-to-data connection and solve the \textit{N$\times$M integration problem} \cite{ray2025survey}. 
+% Explain what MCP is and Why it was introduced
+Introduced by Anthropic in November 2024, MCP is an open-source standard that defines how an AI application exchanges context with external tools and data sources through a uniform interface, rather than through customized, tool-specific integration processes \cite{anthropic_mcp_intro}.
+Hence, MCP can reduce custom code for every AI-to-tool connection and solve the \textit{N$\times$M} integration problem introduced in Chapter \ref{chap:intro}. 
+This scalability challenge occurs when there are \textit{M} number of AI clients (e.g., AI-based chat applications, model APIs, agent frameworks, AI coding assistants) that need customized integration to \textit{N} external tools and resources (e.g., service platforms, APIs, databases, internal services, or files) \cite{ray2025survey}. 
+For instance, if there are 4 different AI applications and 3 different tools, e.g., 3 APIs, then developers need to build 12 separate integrations.
+
+Figure~\ref{fig:mcp_simple} illustrates MCP on a conceptual level. 
+On one side sit AI applications that a user interacts with — chat interfaces such as Claude Desktop, AI coding assistants such as Claude Code. 
+On the other side sit the data sources and tools an organization already operates, such as databases, file systems, development tools, and productivity tools. 
+Without a shared protocol, connecting every AI application to every tool requires a custom integration for each pair, because every tool can have its own authentication, schema, and error handling.
+MCP is positioned in between as a single standardized protocol: each AI application implements MCP once to reach any MCP-compliant tool or data source, and each tool or data source implements MCP once to be reachable by any MCP-compliant application, reducing the \textit{N$\times$M} integration problem into a simpler \textit{N$+$M}.
+The interactions between AI applications and resources and tools are bidirectional because MCP is not just limited to the AI application merely reading from a resource. 
+A tool can, for example, act on a request initiated by the model, and a data source can push updated context back to the application without a new request being issued each time.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/mcp-simple-diagram.pdf}
+    \caption{MCP as a standardized protocol layer between AI applications
+    and the data sources and tools they need to access, replacing
+    bespoke, pairwise integrations with a single shared interface on each
+    side \cite{anthropic_mcp_intro}.}
+    \label{fig:mcp_simple}
+\end{figure}
 
 MCP follows a host-client-server architecture illustrated in Fig. \ref{fig:mcp_architecture} \cite{mcp_architecture}. 
 A host is an AI application, such as Claude Desktop, that embeds one or more MCP clients.
 Each MCP client maintains a connection to a single MCP server and uses contexts and capabilities from that MCP server. 
-Contexts are the stream of information that flows into the language model via the server, such as external data or files. 
-Capabilities are the features a server declares to the client that it can provide during connection setup, such as writing a file or running a query.
-In-depth details of three key participants in MCP—host, client, and server—are discussed further in Section \ref{sec:mcp_components}.
+Contexts are the stream of information that flows into the language model via the server, such as database, files, application-specific information. 
+Capabilities are the features an MCP server can provide, such as writing a file or running an SQL query.
+Section \ref{sec:mcp_components} reviews in detail the three key components in MCP, meaning MCP host, client, and server.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/mcp_architecture.png}
-    \caption{MCP architecture adopts a host-client-server pattern where each host can run several clients. Remote MCP servers use Streamable HTTP transport and serve many clients simultaneously, while local MCP servers use the STDIO (Standard Input/Output) transport on a local machine and typically serve one client. The figure is adapted from the official MCP documentation \cite{mcp_architecture}.}
+    \caption{MCP architecture adopts a host-client-server pattern where each host can run several clients. Remote MCP servers use Streamable HTTP transport and serve many clients simultaneously, while local MCP servers use the STDIO (Standard Input/Output) transport on a local machine and typically serve one client \cite{mcp_architecture}.}
     \label{fig:mcp_architecture}
 \end{figure}
 
 An important concept in MCP is primitives. 
-They are the fundamental building blocks for adding contexts to the language model and enrich interactions between client, server, and language model. 
-MCP specification defines three primitives that a server can expose to a client as follow: 
+According to the official MCP architecture documentation \cite{mcpspec2026}, primitives are the fundamental building blocks for adding contexts to the language model and enrich interactions between client, server, and language model. 
+MCP specification defines three primitives that a server can expose to a client as follows: 
 \begin{enumerate}
-    \item Tools: Tools are functions that the LLM can invoke to take action, for example, API calls, database queries, and information search. 
-    \item Resources: Resources are data that inject contextual data into the model such as API responses, databases, and file contents. 
-    \item Prompts: Prompts are reusable instructions that standardize how users and clients interact with the LLMs.
+    \item Tools: Tools are functions that the LLM can invoke to take action, for example, API calls, database queries, and information search \cite{mcp_tools_2026}.
+    \item Resources: Resources are data that provide contexts for the LLMs to process and they can be, e.g., API responses, code, databases, and file contents \cite{mcpspec2026resources}. 
+    \item Prompts: Prompts are instructions and structured messages that describe how clients can interact with the LLMs \cite{mcp_prompts_2026}. Prompt descriptions are defined in the MCP server and can be, for example, instructions for the LLM to review code and suggest improvements.
 \end{enumerate}
 
-According to the official documentation of MCP \cite{mcp_architecture}, it has two layers: (1) a data layer that implements the JSON-RPC 2.0 based exchange protocol, lifecycle management, and the server and client features described above, 
-and (2) a transport layer that defines the connection-establishment, message-framing, and authorization mechanisms specific to each transport, such as STDIO or Streamable HTTP.
-Conceptually, the data layer is the inner layer, while the transport layer is the outer layer.
-This thesis focuses on the data layer of MCP, which is studied further in Section \ref{sec:data_layer}. 
+MCP communication has two layers \cite{mcpspec2026}: (1) a data layer that implements the JSON-RPC 2.0 based exchange protocol between client and server, including capability and version discovery, and core primitives;
+(2) a transport layer that controls the connection establishment, message framing, communication, and authorization mechanisms between client and server.
+This thesis focuses on the data layer of MCP, which is studied in more details in Section \ref{sec:data_layer}. 
+Conceptually described in Figure \ref{fig:mcp_layers}, the data layer is the "inner" layer that implements the core protocol, while the transport layer is the "outer" layer. 
+The transport layer is responsible for establishing and maintaining the connection between client and server — via STDIO for local processes or Streamable HTTP for remote ones — and handles message framing and authorization. 
+The data layer, nested inside this connection, defines the actual JSON-RPC 2.0 messages exchanged between client and server, including the MCP's core primitives: tools, resources, and prompts. 
+Because these primitives are defined at the data layer rather than the transport layer, they remain independent of the underlying transport mechanism, allowing the same protocol semantics to work whether client and server communicate over STDIO or over the network.
+%  The separation between a data layer and a transport layer is what allows the same JSON-RPC semantics to run unchanged over a local subprocess pipe or a remote HTTPS endpoint, which is the distinction elaborated further in Section \ref{sec:mcp_workflow}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/mcp_layers.png}
+    \caption{MCP as a standardized protocol layer between AI applications
+    and the data sources and tools they need to access, replacing
+    bespoke, pairwise integrations with a single shared interface on each
+    side \cite{anthropic_mcp_intro}.}
+    \label{fig:mcp_layers}
+\end{figure}
 
-% ============================================================
-\subsection{MCP Core Components}
-\label{sec:mcp_components}
-% ============================================================
-This section studies the three key components of an end-to-end MCP architecture: host, client, and server.
-
-\subsubsection{MCP Host}
-In MCP architecture, MCP host is an AI application that the end user interacts with and coordinates and manages one or multiple MCP clients \cite{mcp_architecture}.
-Architecturally, the host acts as the container and coordinator for all MCP
-activity within the application: it creates and manages client instances,
-controls their connection permissions and lifecycle, enforces security policies
-and consent requirements, and handles user authorization
-decisions~\cite{mcpspec2026}.
-Because a single host can connect to multiple MCP servers simultaneously, it is
-also responsible for aggregating the tool, resource, and prompt catalogues
-exposed by all connected servers into a unified context presented to the
-underlying LLM.
-The host is therefore the component that decides what information is visible to
-the model and mediates between the model's requests to invoke tools and the
-policies governing which invocations are permitted.
-Examples of MCP hosts include chat-based GenAI applications such as Claude and ChatGPT, IDE-integrated assistants such as VS Code with GitHub Copilot and Cursor. 
-In the context of this thesis, the Aalto AI Assistant platform \cite{aalto_ai_assistant} acts as the MCP host for the \aitutor proof of concept described in Chapter \ref{chap:implementation}. 
-
-\subsubsection{MCP Client}
-\label{sec:mcp-client}
-The MCP client is embedded inside the MCP host and maintains the actual connection to a single MCP server. 
-The host instantiates one client for every server it connects to, so a host that uses three different MCP servers will maintain three separate, isolated client sessions. 
-
-At session initialization, the client performs the capability-negotiation handshake described in on the host's behalf, and for the remainder of the session it is the channel through which the host forwards tool invocations, resource requests, and prompt requests to the server, and through which the server's responses and notifications are relayed back to the host \cite{mcpclient2026}. 
-Because each client-server pair forms its own isolated session, permissions, policies, and protocol state negotiated with one server do not leak into a different client's session with a different server.
-
-\subsubsection{MCP Server}
-\label{sec:mcp-server}
-
-An MCP server is a program that exposes capabilities---tools, resources, and
-prompts---to MCP clients through the standardized MCP primitives.
-Servers operate independently with focused responsibilities, and each server
-maintains its own capability set that is negotiated with the client during
-session initialization~\cite{mcpspec2026}.
-MCP servers can be deployed in two modes that differ substantially in their
-operational and security characteristics.
-
-\paragraph{Local MCP Server.}
-A local MCP server runs as a subprocess on the same machine as the host and
-communicates with its client exclusively through standard input and output (the
-STDIO transport)~\cite{mcpspec2026}.
-Because the server process is spawned and supervised by the host, its source
-code or binary is present on the user's machine and can in principle be
-inspected, version-pinned, or sandboxed by the operating system before
-execution.
-This makes local servers well suited for resources that are inherently local to
-the user's environment---a filesystem, a local Git repository, or an
-on-premises database---and they are the deployment mode adopted by most
-reference implementations published by the MCP project.
-Their primary limitation is scalability: a STDIO server maintains a
-one-to-one relationship with its client and serves a single user session at a
-time, making the local mode unsuitable for an organization-wide system serving
-many concurrent users simultaneously.
-
-\paragraph{Remote MCP Server.}
-A remote MCP server is hosted on infrastructure separate from the user's
-machine and communicates with the MCP client over a network connection, most
-commonly using the Streamable HTTP transport~\cite{mcpspec2026}.
-Streamable HTTP exposes the server through a single unified HTTP endpoint over
-which the client can send requests and receive both standard HTTP responses and
-streamed server notifications, enabling efficient bidirectional communication
-without requiring a persistent socket connection.
-Unlike a local server, a single remote MCP server can serve many clients
-concurrently---the deployment mode required for an organization-wide GenAI
-assistant serving many simultaneous users.
-This scalability advantage comes at the cost of introducing authentication,
-authorization, and multi-tenancy concerns that the base MCP specification
-delegates to server implementers, as discussed further in
-Chapter \ref{chap:challenges}.
-
-Remote MCP Server can be connected with Streamable HTTP. 
-This is a transport protocol used for the Model Context Protocol (MCP) that enables AI agents to communicate with remote services using a single, unified HTTP endpoint. 
+Unless otherwise noted, this thesis describes MCP as defined by the specification revision \textbf{2026-07-28} published on July 28, 2026. 
+At the time of writing, this is the latest version and the largest revision of MCP since its introduction \cite{mcpspec2026, mcpchangelog2026}. 
+Its biggest change is that MCP is now a stateless protocol: every request is self-contained and carries its own protocol version and capabilities, replacing the stateful, handshake-based session model of earlier revisions \cite{mcpspec2026}. 
+Section \ref{sec:mcp_workflow} studies this change in MCP workflow and Section \ref{sec:proto-limits} discuss its consequences in detail.
+This thesis follows the MCP specification's own terminology and refers to revision 2026-07-28 onwards as \emph{modern}, and to revision 2025-11-25 and earlier as \emph{legacy} \cite{mcpversioning2026}.
 
 % ============================================================
 \subsection{Data layer of MCP}
 \label{sec:data_layer}
 % ============================================================
-The foundation of MCP's data layer is JSON-RPC 2.0 \cite{jsonrpc2020}, a stateless Remote Procedure Call (RPC) that enables structured communication between client and server using JSON format.
-JSON-RPC is a JSON-based wire protocol for RPC \cite{jsonrpc2020}.
-
-On top of the underlying JSON-RPC 2.0 protocol, MCP incorporates a stateful session protocol. 
-The data layer protocol defines the ways developers can share context from MCP servers to MCP clients.
-MCP requires lifecycle management to negotiate the capabilities that both the client and server support before any tool, resource, or prompt can be used. 
-In the example in Code Block \ref{lst:mcp_example}, a session begins with an initialization handshake in which the client and server declare their protocol version and capabilities. for example, whether the server supports resource subscriptions or the client supports sampling.
-Only capabilities declared during this exchange may be used for the remainder of the session, and the session ends with an explicit termination step.
- 
-\begin{lstlisting}[language=JSON, caption={Example MCP initialization in life cycle management. The code is adopted from MCP official documentation \cite{mcp}.}, label={lst:mcp_example}]
+The foundation of MCP's data layer is JSON-RPC 2.0, a lightweight, stateless remote procedure call protocol using JSON format \cite{jsonrpc2020}. 
+Remote Procedure Call (RPC) is a communication pattern that lets a program call a procedure running on a different process or machine using the same syntax as a local function call; the underlying protocol takes care of transmitting the call to the remote process and returning its result \cite{birrell1984implementing}. 
+JSON-RPC is a lightweight realization of this pattern: each procedure call is encoded as a JSON object specifying the method name and its parameters, and each response is a JSON object containing either the method's result or an error \cite{jsonrpc2020}. 
+JSON-RPC is transport-agnostic and can be carried over many different data transport protocols, including common ones such as WebSockets, HTTP/HTTPS, and Standard Input/Output. 
+Because every request-response pair is self-contained at the protocol level --- carrying its own method name, parameters, and identifier (Code Block \ref{lst:jsonrpc-example}) --- JSON-RPC is stateless at the message level and leaves any session or lifecycle semantics to be layered on top by the protocol that uses it, which is exactly the role MCP's data layer plays.
+\begin{lstlisting}[language=json, caption={A JSON-RPC 2.0 \cite{jsonrpc2020} request and response pair. The request object names the method to invoke (\texttt{search}) and its parameters (\texttt{query}), together with an \texttt{id} that lets the client match the eventual response to this specific call. The response shows a successful call, returning its \texttt{result} under the same \texttt{id}.}, label={lst:jsonrpc-example}]
+// Request
 {
   "jsonrpc": "2.0",
-  "id": 1,
-  "method": "initialize",
-  "params": {
-    "protocolVersion": "2025-06-18",
-    "capabilities": {
-      "elicitation": {}
-    },
-    "clientInfo": {
-      "name": "example-client",
-      "version": "1.0.0"
-    }
-  }
+  "method": "search",
+  "params": {"query": "cat"},
+  "id": 1
 }
+
+// Response (success)
+{
+  "jsonrpc": "2.0",
+  "result": {"matches": ["Siberian cat", "Norwegian forest cat"]},
+  "id": 1
+}
+
+\end{lstlisting}
+In the legacy revisions prior to the 2026-07-28 update, MCP defines a lifecycle management scheme, on top of the underlying JSON-RPC 2.0 protocol, that governs session state management and capability negotiation between MCP client and server, including which server's capabilities a client may use \cite{mcpspec2025}. 
+However, in the modern (2026-07-28) revision, this scheme itself is stateless and MCP session state (previously defined in the \texttt{Mcp-Session-Id} header is deprecated. 
+Each request declares its own protocol version and capabilities, and the server accepts or rejects that specific request based on whether it supports the declared version, rather than negotiating a set of capabilities once for a whole session \cite{mcpversioning2026, mcp_revision_blog}. 
+Code Block \ref{lst:mcp_example} shows an example of invoking a search tool by an MCP client in the modern protocol: the request is entirely self-contained and travels on its own, defining its MCP version, client identity, and client capabilities in corresponding fields \cite{soriaparra2026spec}.
+A different tool call can, in principle, be handled by a different server instance entirely, with no state shared between instances \cite{mcpchangelog2026}. 
+This replaces the legacy (2025-11-25 and earlier) pattern, in which a session began with an initialized handshake that negotiated capabilities once and pinned them, together with a server-issued session identifier, for the remainder of the session \cite{mcpversioning2026}.
+ 
+\begin{lstlisting}[language=JSON, caption={An example of client-to-server tool execution request, over HTTP, under the 2026-07-28 MCP specification. Because the protocol is now stateless, every request is self-contained: the request carries its own protocol version (\texttt{MCP-Protocol-Version} header), method and tool name (\texttt{Mcp-Method} and \texttt{Mcp-Name} headers), and client identity and capabilities (\texttt{\_meta} object) in every call, rather than relying on a persistent session established by an earlier handshake.  The code is adapted from the MCP specification changelog \cite{mcpchangelog2026} and the official blog \cite{soriaparra2026spec}.}, label={lst:mcp_example}]
+    POST /mcp HTTP/1.1
+    MCP-Protocol-Version: 2026-07-28
+    Mcp-Method: tools/call
+    Mcp-Name: search
+    
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "tools/call",
+      "params": {
+        "name": "search",
+        "arguments": { "q": "cats" },
+        "_meta": {
+          "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+          "io.modelcontextprotocol/clientCapabilities": {
+            {"elicitation":{"form":{}}
+          },
+          "io.modelcontextprotocol/clientInfo": {
+            "name": "example-client",
+            "version": "1.0.0"
+          }
+        }
+      }
+    }
 \end{lstlisting}
 
-% How it supports tool-using AI systems.
+% ============================================================
+\subsection{MCP Core Components}
+\label{sec:mcp_components}
+% ============================================================
+This section studies the three key components of an end-to-end MCP architecture—host, client, and server—following the latest MCP revision published on July 28, 2026. 
 
-The separation between a data layer and a transport layer is what allows the same JSON-RPC semantics to run unchanged over a local subprocess pipe or a remote HTTPS endpoint, which is the distinction elaborated further in Section \ref{sec:mcp_workflow}.
+\subsubsection{MCP Host}
+In MCP architecture, MCP host is an AI application that the end user interacts with and coordinates and manages one or multiple MCP clients \cite{mcpspec2026}.
+Architecturally, the host acts as the container and coordinator for all MCP activity within the application: it creates and manages client instances and controls their connection permissions, enforces security policies
+and consent requirements, and handles user authorization decisions.
+Because a single host can connect to multiple MCP servers simultaneously, it is also responsible for aggregating the tools, resources, and prompt catalogues exposed by all connected servers into a unified context presented to the underlying LLM.
+The host is therefore the component that decides what information is visible to the model and mediates between the model's requests to invoke tools and the policies governing which tool invocations are permitted.
+Examples of MCP hosts include chat-based GenAI applications such as Claude and ChatGPT, IDE-integrated assistants such as VS Code with GitHub Copilot and Cursor. 
+In the context of this thesis, the Aalto AI Assistant platform \cite{aalto_ai_assistant} acts as the MCP host for the \aitutor proof of concept described in Chapter \ref{chap:implementation}. 
+
+\subsubsection{MCP Client}
+\label{sec:mcp-client}
+The host creates one MCP client for every MCP server it connects to, and each MCP client maintains a dedicated connection to a single MCP server \cite{mcpspec2026}. 
+For example, in Figure \ref{fig:mcp_client}, an MCP host such as Visual Studio Code that connects to three different MCP servers needs to maintain three separate, isolated client connections. 
+Since each client maintains its own connection to the corresponding server, permissions, policies, and any
+per-server capability state remain isolated between a host's different client instances.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/mcp_client.png}
+    \caption{An IDE such as Visual Studio Code (i.e., VS Code) can be used as an MCP host. When VS Code establishes a connection to an MCP server, such as a filesystem server, the VS Code runtime instantiates an MCP client object that maintains the dedicated connection to this filesystem server. Then, when VS Code connects to another MCP server, such as a local database server, the VS Code runtime instantiates another MCP client object to manage this connection. The figure is adapted from the official MCP documentation \cite{mcpspec2026}.}
+    \label{fig:mcp_client}
+\end{figure}
+
+Under the modern MCP protocol (version 2026-07-28) \cite{mcpversioning2026}, there is no session initialization handshake anymore between clieant and server.
+The client now attaches its protocol version and capabilities to the field \texttt{\_meta} on every individual request it sends, and the server may accept or reject that specific request's version independently.
+A client may call the server's \texttt{server/discover} method up front to know what versions and capabilities the server supports before issuing its first substantive request, but this is optional discovery rather than a
+required handshake \cite{mcpversioning2026}. 
+As discussed in Section \ref{sec:data_layer}, in the legacy protocol (2025-11-25 and earlier versions), a client performs the deprecated \texttt{initialize} handshake instead, which negotiates capabilities once and pins them for the lifetime of that session \cite{mcpversioning2026, mcpclient2026}. 
+In modern and legacy revisions of MCP, the client is still the channel through which the host forwards tool invocations, resource requests, and prompt requests to the server, and through which the server's responses and notifications are relayed back to the host \cite{mcpclient2026}.
+
+\subsubsection{MCP Server}
+\label{sec:mcp-server}
+An MCP server is a program that exposes specific capabilities to MCP clients through the standardized MCP primitives, including tools, resources, and prompts \cite{mcpserver2026}.
+MCP servers can be deployed in two modes that differ substantially in their operation.
+Local MCP servers can interact with local filesystems \cite{ray2025survey}.
+
+An AI application can connect to both local and remote MCP servers, which differ substantially in their operations.
+
+\paragraph{Local MCP Server}
+A local MCP server runs as a subprocess on the same machine as the host and communicates with its client exclusively through standard input and output (STDIO) transport \cite{mcpspec2026}.
+For example, Claude Desktop application can connect to the official Filesystem MCP Server \cite{mcpfilesystem2026} as a local subprocess, giving the host controlled, approval-gated access to files on the user's machine \cite{mcplocalservers2026}.
+Because the server process is spawned and supervised by the host, its source code or binary is present on the user's machine and can in principle be inspected, version-pinned, or sandboxed by the operating system before execution \cite{park2026attacksurface}.
+This makes local MCP servers well-suited to connect to resources that are inherently local to the user's environment, such as a filesystem, a local Git repository, or an on-premises database, and to let developers experiment with MCP rapidly.
+In the official documentation of MCP, local servers are adopted by many official reference MCP servers, such as the Git MCP server \cite{mcpexamples2026}.
+On the other hand, the primary limitation of local servers is scalability.
+Since the server process is spawned and owned by a single host process, one STDIO server instance serves one client at a time, regardless of whether the underlying protocol revision is stateful or stateless \cite{mcpspec2026, mcpstdio2026}.
+Scaling to many concurrent users still requires spawning one server process per user, which makes the local transport unsuitable for an organization-wide system serving many concurrent users simultaneously.
+ 
+\paragraph{Remote MCP Server}
+A remote MCP server is hosted on an infrastructure separate from the user's machine and communicates with the MCP client over a network connection, most commonly using the Streamable HTTP transport \cite{mcpspec2026}.
+Streamable HTTP exposes the server through a single unified HTTP endpoint over which the client can send requests and receive both standard HTTP responses and streamed server notifications, enabling efficient bidirectional communication without requiring a persistent socket connection.
+Unlike a local server, a remote MCP server can serve many clients concurrently. 
+Therefore, a remote MCP server with Stremable HTTP transport is suitable for deployment of an organization-wide GenAI
+assistant serving many simultaneous users \cite{mcpremoteservers2026}.
+Under the modern MCP revision, this scalability advantage is reinforced further at the transport level.
+Because the latest MCP revision removes protocol-level sessions and the \texttt{Mcp-Session-Id} header used by earlier revisions, client's requests are no longer pinned to the server instance that handles the initial handshake \cite{mcpspec2026, mcp_revision_blog}. 
+As a result, described in Figure \ref{fig:stateless-topology}, any client's request can land on any server instance behind a round-robin load balancer, instead of being directed to the same server instance in the sticky sessions.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/stateless-topology.pdf}
+    \caption{Topology of MCP's core protocol before and after the removal of protocol-level sessions in the July 28, 2026 revision. Under the previous session-based model (left), a client's requests were pinned to a single server instance via a sticky
+    route, requiring a shared session store across instances. Under the
+    stateless model (right), the load balancer can route any request to any
+    server instance, since no session state is tied to a specific instance.
+    The figure is adapted from the official MCP blog post \cite{mcp_revision_blog}.}
+    \label{fig:stateless-topology}
+\end{figure}
+
+%As a result, a remote deployment can be placed behind an ordinary round-robin load balancer, without sticky sessions or a shared session store.
+This scalability advantage comes at the cost of introducing authentication, authorization, and multi-tenancy concerns that the base MCP specification delegates to server developers, as discussed further in Chapter \ref{chap:challenges}.
+
+Under the modern protocol specification, a server's capability set is no longer negotiated once at the start of the session; instead, each client's incoming request declares the protocol version and capabilities it needs, and the server responds accordingly \cite{mcpspec2026, mcpversioning2026}.
+In stead, a server's capabilities can be found up front through the discovery phase—this is studied more in Section \ref{sec:mcp_workflow}.
+For servers that still use legacy revisions (2025-11-25 and earlier), they negotiate the capabilities once during the initial handshake~\cite{mcpversioning2026}.
+Due to the scope of this thesis, the compatibility and interoperability behaviors between modern and legacy client and server are not covered in detail; they are described in the official MCP versioning documentation \cite{mcpversioning2026}.
+%al and security characteristics \cite{mcpversioning2026}. 
 
 % ============================================================
 \subsection{MCP Workflow}
 \label{sec:mcp_workflow}
 % ============================================================
+%An MCP workflow answers a single question: when, and how often, do a client and server establish what they mutually support before they can safely exchange a message?
+At its core, an MCP interaction follows a simple pattern: a client sends a JSON-RPC \emph{request} specifying which method to invoke and what parameters to pass it, and the server sends a \emph{respond} with a message containing either the method's result or an error \cite{mcpspec2026}. 
+That is, in an MCP workflow, a client and a server share an understanding of what each of them supports, including protocol version and capabilities, before they can safely exchange a message. 
+MCP legacy (2025-11-25 and earlier) and modern (2026-07-28) revisions still share the same core request/response exchange. 
+However, they differ substantially in how a connection is established and maintained, and how a server asks a client for something mid-call. 
+%Every other detail of the workflow — including whether there is a distinct setup phase, whether capabilities are pinned for a whole connection or re-declared per request, and how a multi-step operation keeps track of where it is — follows how often the mutual client-server understanding is established.
+%Everything the protocol does, from listing available tools to invoking one, is built on top of this same request/response exchange.
 
-An end-to-end MCP interaction proceeds through four sequential
-stages~\cite{mcpspec2026}.
+\paragraph{Legacy workflow.} The workflow of legacy MCP revisions can be described as a three-phase lifecycle, i.e., initialization, operation, termination \cite{mcpspec2025}, which remains relevant for interoperability with legacy servers still-deployed. 
+The workflow opens every connection with a handshake that fixes the protocol version and capabilities for the session as a whole, so that no later message needs to renegotiate them.
+As Figure \ref{fig:legacy_workflow} shows, a session opens with an \emph{initialization phase}: the client sends an \texttt{initialize} request that contains the its protocol version and capabilities; 
+the server replies with the protocol version and capabilities it supports, together with a session identifier returned in the \texttt{Mcp-Session-Id} header as metadata;
+and the client confirms with an \texttt{initialized} notification to indicate that it is ready for operation
+The session identifier header scopes every subsequent message to this one negotiated session.
 
-In the \textbf{initialization} stage, the host creates a client and directs it
-to connect to the target server.
-The client sends an initialization request carrying its protocol version and
-supported capabilities; the server responds with its own protocol version and
-capabilities.
-Both parties must agree on a compatible protocol version before proceeding, and
-only capabilities declared during this handshake may be used for the remainder
-of the session.
+Then, every subsequent message during the \emph{operation phase} is exchanged under the capability set fixed by the initialization handshake; 
+no message needs to re-state the successfully negotiated protocol version or capabilities, because the connection itself already carries that context. 
 
-In the \textbf{discovery} stage, the client requests the catalogues of tools,
-resources, and prompts currently exposed by the server.
-The host incorporates the names, descriptions, and input schemas of these
-primitives into the context provided to the LLM, so the model can reason about
-which capabilities are available and how to invoke them.
-Only the declared interface of each primitive is visible to the model; the
-server's internal implementation is never exposed.
+The session ends with an explicit \emph{shutdown phase}: the client disconnects, and the connection is closed. 
+This legacy MCP workflow reflects a conventional stateful network session, and it is efficient precisely because the negotiation happens only once.
+On the other hand, the cost is that the server must hold connection-scoped state for as long as the session lasts, and that state ties a single client to the specific server instance that handled its handshake \cite{mcpversioning2026, soriaparra2026spec}.
 
-During the \textbf{operation} stage, a user- or model-initiated action causes
-the host to direct the client to send a request to the server---most commonly
-a tool invocation.
-The server executes the corresponding handler and returns a structured response;
-the client relays this response to the host, which integrates it into the
-conversation context and passes it to the LLM for further reasoning.
-This request-response loop may repeat any number of times within a single
-session.
-In addition to client-initiated requests, the server may independently push
-resource-update notifications to the client, and the server may initiate
-sampling requests that ask the host LLM to generate content, enabling
-bidirectional, dynamic interactions beyond the simple request-response pattern.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/legacy_workflow.png}
+    \caption{Legacy (2025-11-25 and earlier) MCP workflow: a single
+    initialization handshake fixes the protocol version and capabilities
+    for the entire session, which subsequently ends with an explicit
+    shutdown \cite{mcpspec2025}.}
+    \label{fig:legacy_workflow}
+\end{figure}
 
-The session concludes with a \textbf{termination} stage in which either party
-sends an explicit close notification and the underlying transport connection is
-released.
+\paragraph{Modern workflow.} The 2026-07-28 revision replaces the legacy session-based model with a stateless protocol core: the \texttt{initialize}/\texttt{initialized} exchange and the \texttt{Mcp-Session-Id} header are retired entirely.
+As Figure \ref{fig:modern_workflow} shows, capability discovery is now optional in the modern MCP revision: it becomes an ordinary RPC method called \texttt{server/discover}, rather than being negotiated once during a connection handshake \cite{soriaparra2026spec}. 
+A client may call this method at any point to learn what tools, resources, and prompts a server exposes, but doing so is no longer a precondition for making other requests.
+Thus, if a client already knows what it needs, it can skip discovery and
+call \texttt{tools/call} method directly to invoke a server's tool. 
+In addition, because \texttt{server/discover} method is stateless and cacheable, its response payload has a Time-To-Live \((\texttt{ttlMs})\) parameter and a defined cache scope. % TODO: add code block
+This structural design permits clients to locally persist server's capabilities across multiple executions, effectively eliminating the network overhead of redundant discovery probes on successive requests \cite{soriaparra2026spec}.
+  
+In the workflow of modern MCP revision, operation no longer relies on a capability set fixed earlier in the connection. 
+Instead, the client attaches its desired protocol version and capabilities in the \texttt{\_meta} field of each request it sends. 
+That is, each request is self-contained. 
+If the server supports what is declared, it simply returns a result, exactly
+as it would to any other request; if not, it returns an \texttt{UnsupportedProtocolVersionError}, and the client retries the same request with a version it knows the server supports \cite{mcpversioning2026}. 
 
-In the AI Tutor proof of concept (Chapter~\ref{chap:implementation}), a session
-initializes when a student opens AI Tutor inside Aalto AI Assistant; the
-operation stage carries the transcript-retrieval and course-recommendation tool
-calls described in Section~\ref{sec:aitutor-use-cases}; and the session
-terminates when the student closes the conversation.
+Finally, the shutdown phase is no longer applicable in modern MCP revision because because there is no session state to release.
+Instead, a client simply stops sending requests, and closing the underlying transport connection (if one was open at all) is a transport-level event, rather than a protocol-level one \cite{mcpversioning2026}. % The legacy explicit shutdown that releases session state has no equivalent in the modern protocol.
+This modern MCP workflow is consistent with the design principle that no request should depend on state established by an earlier one.
+As discussed in Section \ref{sec:mcp_components}, since no request depends
+on connection-scoped state set up by an earlier request, any request can be
+answered by any server instance, which is what makes stateless, round-robin deployment possible \cite{mcpchangelog2026}.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/modern_workflow_light.png}
+    \caption{Modern (2026-07-28) MCP workflow: protocol version and capabilities are declared per request via \texttt{\_meta}; an unsupported version yields an explicit error rather than blocking the connection, and the client retries with a mutually supported version. Adapted from the official MCP documentations \cite{mcpversioning2026, soriaparra2026spec}.}
+    \label{fig:modern_workflow}
+\end{figure}
+
+\paragraph{Comparison.} Table~\ref{tab:legacy-modern-lifecycle} compares the legacy and modern workflows stage by stage, alongside each legacy stage's modern equivalent, or lack thereof.
+
+\begin{table}[h]
+\centering
+\caption{Legacy (2025-11-25 and earlier) session-based lifecycle stages versus their modern
+(2026-07-28) counterpart.}
+\label{tab:legacy-modern-lifecycle}
+\begin{tabular}{p{0.22\linewidth} p{0.38\linewidth} p{0.32\linewidth}}
+\toprule
+Legacy stage & Legacy behavior & Modern (2026-07-28) equivalent \\
+\midrule
+Initialization & Explicit \texttt{initialize} handshake negotiates capabilities once; server issues an
+\texttt{Mcp-Session-Id}. Mandatory discovery performed once \& scoped to the negotiated session. & Removed; every request declares its own version and capabilities in \texttt{\_meta}. Optional discovery, callable any time via
+\texttt{server/discover}; list results carry their own cached metadata. \\
+Operation & Request-response loop scoped to the session; server-initiated elicitation requests interleave with it. & Self-contained requests; mid-operation input requests handled via \texttt{InputRequiredResult} and a retry (MRTR). \\
+Shutdown & Explicit close notification releases session state & Not applicable; state, if any, is carried explicitly via handles in tool arguments. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{State across requests.} A consequence of removing the session is that a multi-step operation can no longer implicitly track its own progress; for example, a shopping cart, an open browser context, or a database transaction can no longer be remembered by the server simply because ``the client is still connected'' \cite{mcp_tools_2026}. 
+Figure \ref{fig:handle_pattern} shows that under the modern workflow, a server that needs this kind of continuity instead mints an explicit handle from one call, for example, a \texttt{basket\_id}, which the client threads back as an ordinary argument on subsequent calls that continue the operation, making state visible in the model's own reasoning trace rather than hidden inside the connection \cite{mcp_revision_blog}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/modern_handler.png}
+    \caption{The explicit-handle pattern under the modern MCP revision: the
+    server mints a handle (in this example it is a \texttt{basket\_id}) on one call, and the model
+    threads it back as an ordinary argument on a later call, rather than the
+    server relying on implicit per-connection state.}
+    \label{fig:handle_pattern}
+\end{figure}
+
+\textbf{Mid-operation input with MRTR.} A related consequence for the modern MCP concerns how a server asks a client for input mid-call, for example, to elicit a missing parameter. The legacy model handles this by having the server send a request back to the client over a held-open bidirectional stream. 
+Meanwhile, the modern revision replaces this with \emph{Multi Round-Trip Requests} (MRTR) because there is no persistent connection to hold open: the server terminates the original request with an \texttt{InputRequiredResult} specifying what it needs, and the client resubmits the original call --- as a new, independent request --- with the requested input attached \cite{mcpspec_mrtr}.
+
+The AI Tutor proof of concept presented in Chapter~\ref{chap:implementation} is built against a session-based, legacy
+revision of MCP, since the modern revision had not yet been published at the time that implementation work was carried out. Section \ref{sec:implementation-limitations} discusses this gap and its consequences for the proof of concept in more detail.
+
+% ============================================================
 \subsection{Current Ecosystem of MCP}
-%The emergence of Gen AI tools in recent year has accelerated a new paradigm of interactive and tailored AI agents that focus on a specific, tailored application. FastMCP’s OpenAPI converter has become one of the most popular tools for auto-generating MCP servers from REST APIs.
-
 \label{sec:mcp-ecosystem}
-Since the public release of MCP in November 2024, a large and rapidly growing ecosystem of tooling, server implementations, and client integrations has formed around the technology of MCP.
-On the tooling side, libraries such as FastMCP have substantially lowered the barrier to creating new MCP servers: FastMCP's OpenAPI converter \cite{fastmcp_openapi2026} can automatically generate a working MCP server from an existing REST API specification, so that organizations with established API infrastructure can expose their services to LLM agents without writing MCP-specific server
-code from scratch.
-MCP's official SDK support now spans multiple common programming languages, including TypeScript, Python, Java, and C\#, reflecting the protocol's uptake across diverse development ecosystems.
+% ============================================================
 
-On the adoption side, industry growth has been rapid.
-Major technology companies including Microsoft,
-Google, and Bloomberg have published accounts of MCP adoption for
-engineering and productivity workflows.
-Public server registries track the resulting expansion: the Glama AI registry,
-which indexes community-contributed and official servers, lists tens of thousands of MCP servers as of mid-2026 \cite{glama_mcp_servers_2026}, spanning
-categories from developer tools, databases, and filesystems to finance, browser automation, and research data.
+%The emergence of Gen AI tools in recent year has accelerated a new paradigm of interactive and tailored AI agents that focus on a specific, tailored application. FastMCP’s OpenAPI converter has become one of the most popular tools for auto-generating MCP servers from REST APIs.
+Since the public release of MCP in November 2024, a large and rapidly growing ecosystem of tooling, server implementations, and client integrations has formed around the technology.
 
-As organizations have moved from individual, ad hoc MCP connections toward managing many servers across teams, a \emph{gateway} pattern has emerged as
-a common architectural response: an MCP gateway sits as a reverse proxy between the AI host and the servers it uses, centralizing authentication,
-policy enforcement, and observability rather than distributing these concerns
-across every individual server.
-This pattern is directly relevant to the design of the AaltoMCP framework in
-Chapter~\ref{chap:design}, as it offers a concrete answer to the scalability
-and governance requirements the university context imposes.
+On the tooling side, MCP's official software development kits (SDKs) support multiple common programming languages, including TypeScript, Python, Java, and C\#, reflecting the protocol's uptake across diverse development ecosystems.
+Handy software development frameworks such as FastMCP \cite{fastmcp2026} have substantially lowered the barrier to creating new MCP servers.
+For instance, FastMCP's OpenAPI converter \cite{fastmcp_openapi2026} can automatically generate a working MCP server from an existing REST API specification, so that organizations with established API infrastructure can expose their services to LLM agents without writing MCP-specific server code from scratch.
+The FastMCP framework is also used to develop the \aitutor agent in Chapter \ref{chap:implementation} as the proof-of-concept implementation for this thesis. 
+
+On the enterprise adoption side, industry growth has been rapid.
+Major technology companies including Microsoft \cite{microsoft_mcp_governance2026}, Google \cite{google_mcp2026}, Figma \cite{figma-mcp}, and GitHub \cite{github-mcp-server} have adopted MCP for engineering and productivity workflows.
+Public server registries track the resulting expansion.
+Community-run indexes such as the Glama AI registry \cite{glama_mcp_servers_2026} list tens of thousands of community-contributed and official MCP servers as of mid-2026, spanning categories from developer tools, databases, and filesystems to finance, browser automation, and research data. Anthropic has also since launched an official MCP Registry (at \texttt{registry.modelcontextprotocol.io}) as a namespace and publish/discovery service for the ecosystem \cite{mcpregistry2026}. However, as discussed in Section~\ref{sec:proto-limits}, it functions as a discovery index rather than a security-vetting gate.
+
+As organizations have moved from individual and ad hoc MCP connections toward managing many MCP servers across teams, a \emph{gateway} pattern has emerged as a common architectural response: an MCP gateway sits as a reverse proxy between the AI host and the servers it uses, centralizing authentication, policy enforcement, and observability rather than distributing these concerns across every individual server. This pattern is directly relevant to the design of the \UniMCP framework described in Chapter~\ref{chap:design}, as it offers a concrete answer to the scalability and governance requirements the university context imposes.
+
+\clearpage
 % ============================================================
 \section{Challenges of MCP and Research Gap}
 \label{chap:challenges}
 % ============================================================
 
 MCP has been adopted at significant scale since its introduction in November 2024, but its deployment in organizational, enterprise production environments has exposed a layered set of challenges.
-To reason precisely about these challenges, this chapter distinguishes three origins: (1) limitations inherent to the MCP specification itself (Section \ref{sec:proto-limits}), 
-(2) problems that have emerged in the current ecosystem of MCP implementations and registries (Section \ref{sec:ecosystem-challenges}), and 
-(3) requirements that arise specifically from adopting MCP in a university setting (Section \ref{sec:university-context}).
-This three-way distinction is essential in the thesis because each origin motivates a different category of design decisions in the \UniMCP framework: 
-protocol limitations identify controls that the framework must \emph{add} to what the spec provides; ecosystem challenges identify what the framework must \emph{guard against} at runtime; and
+To reason precisely about these challenges, this chapter distinguishes three origins: (1) limitations inherent to the MCP specification itself (Section \ref{sec:proto-limits});
+(2) problems that have emerged in the current ecosystem of MCP implementations and registries (Section \ref{sec:ecosystem-challenges}); and 
+(3) requirements that arise specifically from adopting MCP in education institutions settings (Section \ref{sec:university-context}).
+This three-way distinction is essential in the thesis because each origin motivates a different category of design decisions in the \UniMCP framework described in Chapter \ref{chap:design}: 
+protocol-level limitations identify controls that the framework can \emph{add} to what the spec provides; 
+ecosystem challenges identify what the framework must \emph{guard against} at runtime; and
 university-context requirements identify the \emph{policies and standards} those controls must satisfy.
+
+\textbf{Threat analysis method.} Rather than applying a single, general-purpose threat-modeling framework such as STRIDE or MAESTRO, each of the three challenge layers is analyzed using evidences appropriate to its origin: official MCP specification, published empirical studies of deployed MCP servers, and applicable regulation and institutional policy.
+Protocol-level limitations (Section~\ref{sec:proto-limits}) are identified through direct analysis of the official MCP specification, checking what the protocol does and does not mandate. 
+Ecosystem-level challenges (Section~\ref{sec:ecosystem-challenges}) are synthesized from published security studies of deployed MCP servers, benchmarked attacks, and documented real-world incidents, organized using the threat categories proposed by Narajala and Habler~\cite{narajala2025enterprise}. 
+University-context requirements (Section~\ref{sec:university-context}) are derived from applicable regulation (GDPR) and institutional policies of \aalto, supplemented by published research on GenAI governance in higher education. 
+This threat analysis method ensures that every threat or requirement carried forward into Chapter~\ref{chap:requirements} is traceable to a specific, citable origin rather than to the author's own judgement alone.
 
 % ------------------------------------------------------------
 \subsection{Protocol-Level Limitations}
@@ -895,178 +1024,114 @@ university-context requirements identify the \emph{policies and standards} those
 Protocol-level limitations are structural properties of the MCP specification as designed \cite{mcpspec2026}.
 They are not failures of any particular implementation; they are deliberate design choices that maximize
 flexibility at the cost of leaving specific security and multi-tenancy properties entirely to the
-developer \cite{hou2025landscape, yan2025mcpmisuse, narajala2025enterprise}.
+developer \cite{yan2025mcpmisuse, hou2025landscape, narajala2025enterprise}.
 
 \textbf{No mandatory authentication or authorization.}
-The MCP specification recommends that remote MCP servers using the Streamable HTTP transport follow OAuth 2.1, but it does not mandate anny specific authentication mechanism and provides no authorization enforcement at the protocol layer \cite{mcpspec2026, mcp_authorization_2025}.
-Therefore, a server that omits authentication entirely is compliant with the MCP specification.
-This means the protocol itself cannot prevent an unauthenticated client from discovering and invoking
-a server's tools if the operator neglects to implement access controls.
+The MCP specification recommends that remote MCP servers using the Streamable HTTP transport follow OAuth 2.1, but at the protocol layer it does not mandate any specific, strict authentication mechanism and provides no authorization enforcement \cite{mcpspec2026, mcp_authorization_2025, mcp_streamable_http}.
+Therefore, a server that omits authentication entirely is still compliant with the MCP specification.
+This means the protocol level itself cannot prevent an unauthenticated client from discovering and invoking
+a server's tools if the server's operator neglects to implement access controls.
+Because authorization is optional at the protocol level, the responsibility for authenticating clients and authorizing tool access falls to individual server operators \cite{narajala2025enterprise, owasp_mcp_security_2026}.
 
-\textbf{No mandatory transport security.}
-The MCP specification does not rTLS for any transport variant~\cite{mcpspec2026}.
-Using Streamable HTTP over HTTPS is a convention rather than an enforced protocol property, and the
-specification provides no mechanism to negotiate or verify transport security between a client and a server.
+\textbf{No protocol-level transport security.}
+The MCP application layer remains entirely decoupled from transport security mechanisms. The specification defines how messages are framed and structured using JSON-RPC, but it mandates no native protocol-level mechanisms to negotiate, verify, or enforce cryptographic security between a client and a server \cite{mcpspec2026}. When using remote transport variants, such as Streamable HTTP, transport security (TLS/HTTPS) is an architectural deployment requirement rather than an intrinsic property enforced by the MCP engine itself. 
+Consequently, developers must rely on external infrastructure—such as reverse proxies, API gateways, or application-level network stacks—to secure the underlying transport channel \cite{mcp_streamable_http, owasp_mcp_security_2026}.
 
 \textbf{Free-form tool descriptions.}
 MCP tool descriptions are arbitrary natural language strings with no structure, length limit, or semantic
-constraint imposed by the specification~\cite{mcpspec2026}.
-This is a deliberate flexibility decision, but it is also the structural property that makes tool poisoning
-attacks possible: since the LLM processes tool descriptions as part of its reasoning context, a maliciously authored description can redirect the model's behavior regardless of what the tool's code
-actually does~\cite{wang2026mcptox}.
+constraint imposed by the MCP specification \cite{mcpspec2026}.
+This is a deliberate flexibility decision, but it also makes MCP systems prone to tool poisoning attacks—a cybersecurity attack that happens when malicious instructions embedded in a tool's description \cite{hasan2026mcp}. 
+Since the LLM processes tool descriptions as a part of its necessary context, the poisoned description acts as a command to manipulate the model's behavior, leading to adversarial attack such as hijacking the functions of other trusted tools or exposing personal, sensitive data \cite{wang2026mcptox}.
+For instance, if an MCP server has a tool with file writing permission, its LLM can be manipulated to add malicious code snippets in the \texttt{.bashrc} file to open a backdoor port for attacker \cite{radosevich2025mcp}.
 
-\textbf{No server vetting or registry governance.}
-The MCP specification does not have any default mechanism for verifying the provenance, integrity, or reliability of an MCP server before a client connects to it~\cite{mcpspec2026}.
-There is no concept of a verified publisher identity, a server certificate tied to an audited source, or a
-protocol-level revocation mechanism.
-Which MCP servers to trust is delegated entirely to the MCP host operator.
+\textbf{Deficient server vetting and registry governance.}
+The specification mandates no default mechanism for verifying the provenance, integrity, or reliability of an MCP server before a client connects to it \cite{mcpspec2026}. 
+As introduced in Section \ref{sec:mcp-ecosystem}, Anthropic has since launched an official MCP Registry at \texttt{registry.modelcontextprotocol.io} as a namespace and discovery service for publishing and
+finding servers; however, it functions as a publish and discovery index rather than a security gate, and listing a server does not require independent security review or a verified-publisher certification analogous to a code-signing authority. There is still no concept of a verified publisher identity tied to an audited source, nor a protocol-level revocation mechanism reachable from the client. Which MCP servers to trust depends on the MCP host operator.
 
-\textbf{Single-tenant session model.}
-The MCP session model is designed around a stateful,
-one-to-one relationship between a single client and
-a single server~\cite{mcpspec2026}.
-The specification provides no built-in primitives for
-session namespacing, tenant isolation, or per-user
-context separation within a shared server instance.
-Multi-tenancy --- multiple authenticated users sharing
-the same server process --- must be implemented
-entirely outside the protocol layer.
+\textbf{No built-in tenant isolation.}
+As discussed in Section~\ref{sec:mcp_workflow}, the modern (2026-07-28) revision removed the stateful, session-based model of earlier revisions in favor of self-contained requests. Legacy revisions are built around a session-based protocol between a client and a server, with no built-in primitive for namespacing a session or separating one user's context from another's within a shared
+server process; multi-tenancy had to be implemented entirely outside the protocol layer \cite{mcpversioning2026}. 
+The modern revision instead carries a state as an explicit, server-minted handle passed back as an ordinary tool argument (Figure~\ref{fig:handle_pattern}) \cite{mcp_revision_blog}. This resolves the scalability problem the legacy session model created, but it does not, by itself, guarantee tenant isolation: because a handle is just a value the client supplies like any other argument, the specification provides no protocol-level check that a handle issued for one authenticated user cannot be supplied, accidentally or maliciously, under a different user's request. 
+Whether a handle-based resource is re-verified against the requester's identity on every use, or is trusted merely because the client possesses it, is left to the MCP server implementation.
 
 % ------------------------------------------------------------
 \subsection{Ecosystem-Level Challenges}
 \label{sec:ecosystem-challenges}
 % ------------------------------------------------------------
 
-Ecosystem-level challenges are problems that emerge not from the specification, but from the current state of
+Ecosystem-level challenges are problems that emerge not from the protocol specification, but from the current state of
 how MCP systems are built, deployed, and maintained.
 They are empirically observable in deployed servers and would persist even if all operators were fully aware of the protocol-level limitations above.
 
-\textbf{Widespread security vulnerabilities in deployed servers.}
-Hasan et al.\ conducted a large-scale empirical evaluation of MCP server security across 1,899 open-source servers and found that 7.2\% contain at least one statically detectable security vulnerability \cite{hasan2025mcp}.
-%The most prevalent vulnerability pattern is credential exposure (affecting 3.6\% of servers), followed by lack of access control (1.4\%), CORS issues (1.2\%), and transport security weaknesses (0.7\%) \cite{hasan2026mcp_security}. 
-The most prevalent class is credential exposure---hardcoded API keys and passwords in source code, which affect 3.6\% of servers.
-Lack of access control affects 1.4\%, and transport security issues such as SSL verification bypasses affect 0.7\%.
-%The empirical research conducted by Hasan et al. on 1,899 open-source MCP servers shows that 7.2\% of them are affected by vulnerability patterns and 5.5\% of them suffer from MCP-specific tool poisoning. 
+\textbf{Widespread security vulnerabilities in open-source servers.}
+Hasan et al.\ conduct a large-scale empirical evaluation of MCP server security across 1,899 open-source servers and find that 7.2\% contain at least one detectable security vulnerability \cite{hasan2025mcp}.
+This study also discovers that the most common vulnerability class is credential exposure, e.g., hardcoded API keys and passwords in source code, which affects 3.6\% of servers.
+In addition, lack of access control affects 1.4\%, and transport security issues such as SSL verification bypasses affect 0.7\%.
 
 \textbf{Tool poisoning in deployed servers.}
-The study conducted by Hasan et al.\ found that 5.5\% of analyzed MCP servers already exhibit tool poisoning, which involve malicious instructions embedded in tool descriptions that direct the LLM to perform unintended actions~\cite{hasan2025mcp}.
+The same empirical study conducted by Hasan et al. \cite{hasan2025mcp} also finds that 5.5\% of the analyzed MCP servers are affected by tool poisoning, which involves malicious instructions embedded in tool descriptions that direct the LLM to perform unintended actions that lead to credential theft and malicious code execution. 
 %Tool poisoning in indirect prompt injection. Prompt injection is a major cybersecurity threat that allows attackers to hijack or manipulate agent's behavior. The attackers can input malicious instructions in their prompts or external data sources such as documents and websites. 
-The MCPTox benchmark confirmed that current LLM agents are broadly susceptible: success rates reached 72.8\%
-across 20 production models, with refusal rates below 3\%~\cite{wang2026mcptox}.
+In another study in 2025, Wang et al. develop MCPTox, a benchmarking tool to systematically evaluate robustness of 20 prominent LLMs against tool poisoning in real-world MCP servers \cite{wang2026mcptox}.
+This study confirms that these LLMs are broadly susceptible to tool poisoning: the highest attack success rate reaches 72.8\% with the o1-mini model, while the highest attack refused rate is just below 3\% with the Claude-3.7-Sonnet model.
 
 \textbf{Post-deployment mutation attacks.}
-Park et al.\ documented a qualitatively different threat: the rug-pull pattern, in which a server that
-behaves correctly at installation time is later silently modified~\cite{park2026attack}.
-A real-world instance in September 2025 saw an unofficial Postmark MCP server with over 1,500 weekly
-downloads modified to exfiltrate outgoing emails, remaining undetected for several weeks.
-This threat is structurally enabled by the protocol's lack of server integrity guarantees (Section~\ref{sec:proto-limits}).
+Bhatt et al.\ document a qualitatively different threat: the rug pull attack, in which a server that behaves correctly at installation time is later silently modified, leading to changes in its tools and behaviors \cite{bhatt2025etdi}.
+A real-world rug pull attack happened in 2025, when an unofficial Postmark MCP server with over 1,500 weekly downloads was modified to exfiltrate user emails to attacker address, remaining undetected for several weeks \cite{postmark2025incident}.
+This threat is structurally enabled by the protocol's lack of MCP server integrity guarantees discussed in Section~\ref{sec:proto-limits}.
 
 \textbf{Cryptographic misuse.}
-Yan et al.\ applied MICRYSCOPE, the first static
-analysis framework targeting cryptographic misuse
-specifically in MCP servers, and found widespread
-ad hoc practices across deployed servers, including
-weak hash functions used for password storage and
-missing authentication~\cite{yan2025cryptography}.
-Because the specification imposes no cryptographic
-requirements, these practices arise from individual
-developer decisions without any protocol-level
-safety net.
+Yan et al.\ apply MICRYSCOPE, the first static analysis framework targeting cryptographic misuse specifically in MCP servers, and find widespread ad hoc practices across deployed servers, including weak hash functions used for password storage and missing authentication \cite{yan2025mcpmisuse}.
+Because the MCP specification imposes no cryptographic requirements, these practices arise from individual developer decisions without any protocol-level safety net.
 
 \textbf{Immature enterprise tooling.}
-Most reference and community MCP servers default to the
-STDIO transport, which imposes a one-process-per-session
-model unsuitable for concurrent organizational
-deployment~\cite{descope2025enterprise}.
-Enterprise-grade capabilities --- OAuth~2.1 compliance,
-SSO integration, centralized audit logging, and granular
-per-user permissions --- are absent from most server
-implementations and must be built independently by
-each operator~\cite{narajala2025enterprise}.
+Most reference, community MCP servers default to the STDIO transport, which imposes a one-process-per-session architecture that is not suitable for concurrent organizational deployment \cite{descope2025enterprise}.
+Enterprise-grade capabilities --- including OAuth~2.1 compliance, SSO integration, centralized audit logging, and granular
+per-user permissions --- are absent from most server implementations and must be built independently by each operator \cite{narajala2025enterprise}.
 
-\textbf{Unvetted public registries.}
-Public MCP registries list tens of thousands of servers contributed by anonymous or pseudonymous authors without
+\textbf{Public registries not reviewed.}
+Public MCP registries such as Glama list tens of thousands of servers contributed by anonymous or pseudonymous authors without
 systematic security review~\cite{glama_mcp_servers_2026}.
-Because integration between requires only a URL, a single compromised MCP server can affect a large population before
-any registry-level intervention.
+Moreover, because integrating an AI host with a remote MCP server via HTTP transports requires only a URL, a single compromised MCP server can affect a large population before any registry-level intervention. 
 
 % ------------------------------------------------------------
 \subsection{University-Context Requirements}
 \label{sec:university-context}
 % ------------------------------------------------------------
 
-University-context requirements are constraints that
-arise from the specific regulatory, institutional, and
-operational environment of a higher education
-institution.
-They would need to be addressed even if the protocol-
-level limitations and ecosystem-level challenges above
-were fully resolved.
+University-context requirements are constraints that arise from the specific regulatory, institutional, and operational environment of typical higher education institution.
+They need to be addressed even if the protocol-level limitations in Section \ref{sec:proto-limits} and ecosystem-level challenges in Section \ref{sec:ecosystem-challenges} are fully resolved.
 
-\textbf{GDPR and data protection.}
-European universities are subject to the General Data
-Protection Regulation, which governs the collection,
-processing, storage, and transfer of personally
-identifiable data.
-Student academic records --- transcripts, enrollment
-history, grades --- constitute personal data under GDPR
-and are subject to the principles of data minimization,
-purpose limitation, and storage
-limitation~\cite{ng2025security}.
-A recent study of GenAI usage policies at universities
-across twelve countries found that GDPR was not designed
-with GenAI capabilities in mind and leaves clear gaps,
-for example around a model inferring sensitive student
-attributes from language patterns rather than from
-formal records~\cite{ng2025security}.
+\textbf{Data protection regulation.}
+Higher education institutions around the world must adhere to the local regulatory frameworks to safeguard data privacy.
+For instance, European universities are subject to the General Data Protection Regulation (GDPR), which governs the collection, processing, storage, and transfer of personally identifiable data \cite{gdpr2016}.
+Student academic records, such as transcripts, enrollment history, and grades, are personal data under GDPR and are subject to the principles of data minimization, purpose limitation, and storage limitation \cite{ng2025security}.
+A recent study of GenAI usage guidelines at 43 universities across 12 countries finds that GenAI introduces privacy risks not addressed by existing security frameworks of these universities, including the risk of inferring or
+exposing sensitive personal information beyond what a user directly discloses \cite{ng2025security}.
 
 \textbf{Institutional data classification.}
-Universities maintain their own data classification
-hierarchies beyond GDPR's legal categories.
-Aalto University classifies information as public,
-internal, confidential, or
-secret~\cite{aalto2026assistant}.
-Student transcripts are confidential; the course
-catalogue is internal.
-An MCP integration must enforce these tiers at the
-tool response layer so that confidential data is
-handled differently from internal or public data,
-and secret data is never processed by a GenAI system.
+Educational institutions maintain their data classification hierarchies because legal frameworks such as GDPR define obligations for personal data, and because these institutions need to handle different kinds of data such as research publication, financial records, exam materials, and network credentials.
+For example, Aalto University classifies information as public, internal, confidential, or secret \cite{aalto_classification_info}.
+In the context of the \aitutor use case (Section~\ref{sec:aitutor-use-cases}), student data, such as
+email addresses, student numbers, and transcripts, fall under the confidential tier, while the course information
+catalog is public.
+That means that an MCP integration must enforce these tiers at the tool response layer so that confidential data is
+handled differently from internal and public data, and secret data should never be processed by a GenAI system.
 
 \textbf{Institutional identity and SSO.}
-University services are identity-bound: access to a
-student's transcript is tied to that student's
-institutional identity, managed by the university's
-identity provider.
-For example, at Aalto University, this is Azure Active Directory
-via OIDC-based Single Sign-On~\cite{aalto_ai_assistant}.
-An MCP integration must integrate with the
-university's existing identity infrastructure and
-propagate the verified institutional identity through
-the tool call chain so that server-side data scoping
-can enforce ownership.
+University services are identity-bound: access to a student's transcript is tied to that student's institutional identity, which is typically managed by the university's identity authentication provider.
+Therefore, an MCP integration must integrate with the university's existing identity infrastructure and propagate the verified institutional identity through the tool call chain so that server-side data scoping can enforce ownership.
 
 \textbf{Multi-role user population.}
 A university's user population is not homogeneous.
-Students, teaching staff, administrative staff, and
-IT personnel hold meaningfully different access rights
-to institutional systems.
-An MCP integration must support role-based access
-control that reflects these distinctions, preventing,
-for example, a student from invoking a tool that an
-academic advisor could legitimately use to access
-any student's record.
+Students, teaching staff, research staff, administrative staff, and IT personnel typically hold different access rights to institutional systems.
+An MCP integration must support role-based access control that reflects these distinctions, preventing,
+for example, a student from invoking a tool that an academic advisor could legitimately use to access records of other students. 
 
 \textbf{Institutional audit accountability.}
-Universities are subject to governance requirements
-and potential regulatory audits beyond those of a
-typical consumer product.
-Access to student personal data must be logged in a
-tamper-evident, user-attributable form, retained for
-institutionally defined periods, and available for
-compliance reporting.
-This is a stricter requirement than general-purpose
-application logging.
+Universities are subject to governance requirements and potential regulatory audits beyond those of a typical consumer product.
+Access to student personal data must be logged in a tamper-evident, user-attributable form, retained for institutionally defined periods, and available for compliance reporting.
+This is a stricter requirement than general-purpose application logging.
 
 % ------------------------------------------------------------
 \subsection{Research Gap}
@@ -1074,18 +1139,20 @@ application logging.
 % ------------------------------------------------------------
 
 The three challenge layers identified in this chapter combine into a research gap.
-At the protocol level, MCP provides no authentication, no transport security requirement, no tool description constraints, no server vetting mechanism, and no multi-tenancy primitives \cite{mcpspec2026}.
-At the ecosystem level, deployed servers exhibit widespread credential exposure, tool poisoning, and
-post-deployment mutation, in registries that provide no systematic governance.
-At the university-context level, GDPR, institutional data classification, identity-bound SSO, multi-role
-access control, and audit accountability impose requirements that go beyond what the protocol and
-its current ecosystem provide.
+At the protocol level, while the MCP specification outlines OAuth 2.1 for remote endpoints, it treats authentication as structurally optional, meaning default implementations can operate without mandatory authentication or strict transport layer enforcement; furthermore, MCP provides no native tool description constraints or server vetting mechanisms (Section \ref{sec:proto-limits}). 
+At the ecosystem level, deployed servers exhibit widespread cybersecurity risks, including credential exposure, tool poisoning, and post-deployment mutation in registries that provide no systematic governance.
+At the university-context level, data protection regulation, institutional data classification, identity-bound SSO, multi-role
+access control, and audit accountability impose requirements that go beyond what MCP and its current ecosystem provide.
 
-\textbf{No existing work addresses all three layers
-together in a university GenAI production context.}
-Table~\ref{tab:gap-analysis} positions the four most
-directly relevant prior works against the three
-challenge layers.
+\textbf{No existing work addresses all three layers of challenges together in a university GenAI production context.}
+Table~\ref{tab:gap-analysis} presents the four most directly relevant prior works against these three challenge layers.
+
+\begin{enumerate}
+    \item Narajala and Habler~\cite{narajala2025enterprise} propose an enterprise-grade MCP security framework covering the protocol and ecosystem layers, but they do not address university-specific regulatory obligations, institutional identity infrastructure, or data classification requirements.
+    \item Hasan et al. \cite{hasan2025mcp} characterize  ecosystem-level vulnerabilities empirically but propose no integration framework.
+    \item Ng et al.~\cite{ng2025security} establish the university-context requirements for GenAI systems but do not address MCP. 
+    \item Hou et al.~\cite{hou2025landscape} survey the MCP threat landscape but propose no concrete framework or implementation.
+\end{enumerate}
 
 \begin{table}[h]
 \centering
@@ -1113,91 +1180,56 @@ Hou et al.~\cite{hou2025landscape} &
 \end{tabular}
 \end{table}
 
-Narajala and Habler~\cite{narajala2025enterprise}
-propose an enterprise-grade MCP security framework
-covering the protocol and ecosystem layers, but
-they do not address university-specific regulatory
-obligations, institutional identity infrastructure,
-or data classification requirements.
-Hasan et al. \cite{hasan2025mcp} characterize
-ecosystem-level vulnerabilities empirically but
-propose no integration framework.
-Ng et al.~\cite{ng2025security} establish the
-university-context requirements for GenAI systems
-but do not address MCP.
-Hou et al.~\cite{hou2025landscape} survey the MCP
-threat landscape but propose no concrete framework
-or implementation.
-
-This thesis fills the gap by proposing \textbf{\UniMCP}, a standardized MCP integration framework for GenAI
-production systems in university contexts, which simultaneously addresses all three layers:
-adding authentication, authorization, tool vetting,
-and multi-tenancy above the protocol layer;
-defending against ecosystem-level threats through
-runtime integrity verification and a vetted tool
-registry; and satisfying university-context
-requirements through GDPR-aware data handling, data classification enforcement, Azure AD
-integration, and institutional audit logging.
+This thesis fills the gap by proposing \textbf{\UniMCP}, a standardized MCP integration framework for GenAI production systems in university contexts, which simultaneously addresses all three layers:
+adding mandatory authentication, authorization, tool vetting, and multi-tenancy above the protocol layer;
+defending against ecosystem-level threats through runtime integrity verification and a vetted tool registry; and satisfying university-context requirements through GDPR-aware data handling, data classification enforcement, institutional identity integration as well as institutional audit logging.
 The requirements that operationalize these objectives are derived in Chapter~\ref{chap:requirements}.
 
- 
-Data exfiltration is another attack pattern where the attackers manipulate the model to reveal sensitive information. Cryptographic misuses in MCP servers are another issues emerged with the rise of MCP.
-
-\subsection{AI in University Contexts}
-
+\subsection{GenAI in University Contexts}
 % This subsection should bridge the background chapter to the \UniMCP framework.
-Universities process large volumes of sensitive personal data as a routine part of their operations, spanning study planning, course enrollment, transcripts, advising, and broader administrative workflows. 
-Therefore, GenAI assistants deployed inside a university need stricter governance and control than general-purpose chatbots.
-A single compromised data integration could expose private education records or student emails \cite{ng2025security}.
-
-For European universities as \aalto, the General Data Protection Regulation (GDPR) governs how any personally identifiable student data may be collected, processed, and retained, including data that surfaces temporarily in an LLM's context window during a tool-mediated interaction.
-A recent qualitative analysis of GenAI usage guidelines from universities across 43 universities across 12 countries \cite{ng2025security} finds that institutions broadly acknowledge privacy and security risks posed by GenAI, but that existing regulatory frameworks fall short of addressing GenAI-specific threats.
+Universities need to process large volumes of sensitive personal data as a routine part of their operations, spanning study planning, course enrollment, transcripts, advising, and broader administrative workflows. 
+Therefore, GenAI assistants deployed for university users need stricter governance and control than general-purpose chatbots, because a single compromised data integration could expose private education records or emails \cite{ng2025security}.
+For European universities as \aalto, the General Data Protection Regulation (GDPR) governs how any personally identifiable student data may be collected, processed, and retained, \cite{gdpr2016}) --- that includes data existing temporarily in an LLM's context window during a tool-mediated interaction.
+A recent qualitative analysis of GenAI usage guidelines from universities across 43 universities across 12 countries finds that institutions broadly acknowledge privacy and security risks posed by GenAI, but that existing regulatory frameworks fall short of addressing specific threats imposed by GenAI \cite{ng2025security}.
 For example, a model's capacity to infer sensitive personal attributes indirectly from a student's language patterns, without
 ever accessing a formal education record.
 This implies that governance of an university GenAI system requires controls that go beyond regulatory compliance alone.
-Therefore, the analysis recommends GenAI-specific risk assessment frameworks and technical safeguards tailored to academic contexts \cite{ng2025security}. 
-Beyond regulatory compliance, the growing student demand for accessible AI tools further motivates MCP adoption, since MCP can reduce development time and accelerate the deployment of new capabilities in GenAI systems. 
-However, this adoption requires governance, authentication, authorization, auditing, and privacy controls tailored to the university setting. 
-Hence, this thesis identifies a critical need for an MCP integration framework that focuses on security and scalability in university contexts.
+Therefore, the analysis recommends GenAI-specific risk assessment frameworks and technical safeguards tailored to academic contexts \cite{ng2025security}.
 
 \clearpage
-
 % ============================================================
 \section{Research Methodology and Requirements}
 \label{chap:requirements}
+% how to design a secure layer/system of MCP in GenAI production system of university?
 % ============================================================
 
 \subsection{Research Questions}
 
-The challenges identified in Section \ref{chap:challenges} show that MCP leaves authentication,
-transport security, server vetting, and multi-tenancy unresolved at the protocol level, that these gaps are exploited in practice at the ecosystem level, and that university deployment adds regulatory and identity
-requirements on top. No existing framework addresses all three layers
-together for a university GenAI production system. This research gap motivates two
-research questions:
+The challenges identified in Section \ref{chap:challenges} show that MCP leaves authentication, transport security, and server vetting unresolved at the protocol level, that these gaps are exploited in practice at the ecosystem level, and that university deployment adds regulatory and identity requirements on top. No existing framework addresses all three layers together for a university GenAI production system. Therefore, this research gap strongly motivates three research questions:
  
-\begin{itemize}
-    \item \textbf{RQ1.} How can MCP be securely integrated into a GenAI
-    production system for university use?
-    \item \textbf{RQ2.} How can a scalable MCP framework be designed and
-    implemented within a university's GenAI production system?
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{What are the main security threats when integrating MCP into a production-level university GenAI system?}
+    \item \textbf{How can a secure MCP integration layer be designed to mitigate these threats?}
+    \item \textbf{How effective is the proposed system?}
+\end{enumerate}
  
-RQ1 concerns the enforcement of authentication, authorization, consent, and data-classification controls around MCP tool invocation. 
-RQ2 concerns whether new institutional tools and data sources can be integrated, and whether the resulting system can serve a growing user population, without redesigning the underlying agentic pipeline. 
-Both questions are answered through the design, implementation, and evaluation of a single artifact, \UniMCP, instantiated through the \aitutor proof of concept.
+Research question (RQ) 1 concerns identifying and characterizing the concrete security threats --- at the protocol, ecosystem, and university-context levels --- that arise when MCP is integrated into a university GenAI production system, and is addressed by the threat analysis in Chapter~\ref{chap:challenges}.
+RQ2 concerns how a layer of security controls can be designed, on top of MCP, to mitigate the threats identified under RQ1, and is addressed by the requirements derived in this chapter and the design presented in Chapter~\ref{chap:design}.
+RQ3 concerns whether the resulting design, once implemented, actually closes the threats it is designed against, and is addressed by implementing the design as the \aitutor proof of concept (Chapter~\ref{chap:implementation}) and evaluating it against established, independent security-testing methods (Chapter~\ref{chap:evaluation}).
+All three questions are answered together through the design, implementation, and evaluation of a single artifact, \UniMCP, instantiated through the \aitutor proof of concept.
 
-% ·····················
+% ------------------------------------------------------------
 \subsection{Research Methodology}
 \label{sec:methodology}
-% ·····················
-This thesis follows the Design Science Research Methodology (DSRM) proposed by Peffers et al.~\cite{peffers2007design}, a six-step process for producing and evaluating a viable artifact -- here, a framework -- in
-response to an organizational problem~\cite{hevner2004}. 
-DSRM is used because the contribution of this thesis is not a theoretical model but a deployable integration framework whose value must be demonstrated in a real production environment. 
-The artifact of the thesis is \UniMCP, a standardized MCP integration framework for GenAI production systems in university contexts.
-\UniMCP  is developed in response to practical requirements identified in Aalto AI Assistant and evaluated through the development of AI Tutor proof of concept.
-Table~\ref{tab:dsrm-mapping} maps each DSRM step to  the corresponding chapter of this thesis.
+% ------------------------------------------------------------
 
- 
+ % what is design science research? More importantly, the artifact must demonstrate its utility and quality through its solution to a real-world challenge.
+This thesis follows the Design Science Research Methodology (DSRM) proposed by Peffers et al. \cite{peffers2007design}, a six-step process for producing and evaluating a viable artifact in response to a real-life organizational problem \cite{hevner2004design}. 
+DSRM is suitable when the research contribution is a viable artifact, e.g., a framework, model, or instantiation, designed to solve an organizational business problem --- most notable in the engineering and computer science disciplines \cite{hevner2004design}.
+Therefore, DSRM is suitable for this thesis because the thesis artifact is the framework \UniMCP --- a standardized MCP integration framework for GenAI production systems in university contexts. 
+\UniMCP is developed in response to the three layers of challenges identified in Section \ref{chap:challenges} and its application and evaluation is conducted through the development of the AI Tutor application (Section \ref{sec:aitutor-use-cases} and \ref{chap:implementation}).
+Table~\ref{tab:dsrm-mapping} maps each DSRM step to the corresponding chapter of this thesis.
+
 \begin{table}[h]
 \centering
 \caption{Mapping of the DSRM six-step process to thesis chapters}
@@ -1206,61 +1238,41 @@ Table~\ref{tab:dsrm-mapping} maps each DSRM step to  the corresponding chapter o
 \toprule
 DSRM step & Thesis chapter \\
 \midrule
-    1. Problem identification and motivation & Chapter~1 (Introduction),
-    Section~2.6 (Challenges of MCP and Research Gap) \\
-    2. Definition of objectives for a solution & Section~3.3 (Requirement
-    Derivation, this chapter) \\
-    3. Design and development & Chapter~5 (Design of \UniMCP) \\
-    4. Demonstration & Chapter~6 (Implementation of \UniMCP: AI Tutor
-    Application) \\
-    5. Evaluation & Chapter~7 (Evaluation and Results), Section~3.4 (this
-    chapter, evaluation approach) \\
-    6. Communication & This thesis document, to Aalto University IT
-    Services and submitted to Aaltodoc, the academic research community \\
+    1. Problem identification and motivation & Chapter \ref{chap:intro} (Introduction),
+    Chapter \ref{chap:challenges} (Challenges of MCP and Research Gap) \\
+    2. Definition of objectives for a solution & Chapter \ref{chap:requirements} (Research Methodology and Requirements) \\
+    3. Design and development & Chapter \ref{chap:design} (Design of \UniMCP) \\
+    4. Demonstration & Chapter \ref{chap:implementation} (Implementation of \UniMCP: AI Tutor Application) \\
+    5. Evaluation & Chapter \ref{chap:evaluation} (Evaluation and Results), Section (this chapter, evaluation approach) \\
+    6. Communication & This thesis work for the Aalto University IT Services and thesis document submitted to Aaltodoc for the academic research community \\
 \bottomrule
 \end{tabular}
 \end{table}
- 
-The case study context (Aalto AI Assistant, Section \ref{sec:aalto-ai-assistant}) and the
-proof-of-concept use case (AI Tutor, Section \ref{sec:aitutor-use-cases}) operationalize Step~2 by
-grounding the abstract objectives of secure integration and scalability in a concrete organizational setting, rather than treating \UniMCP as a general-purpose framework evaluated in the abstract.
-
- % what is design science research?
-This thesis follows the \emph{Design Science Research Methodology} (DSRM) proposed by Peffers et al. \cite{peffers2007design}, which standardizes design science research in information systems as a sequential, six-step process.
-DSRM is suitable when the research contribution is a viable artifact, e.g., a framework, model, or instantiation, designed to solve an organizational business problem, most notable in the engineering and computer science disciplines \cite{hevner2004design}.
-More importantly, the artifact must demonstrate its utility and quality through its solution to a real-world challenge.
-
-
-%In the \emph{problem identification and motivation} step (Chapter~\ref{chap:intro} and Chapter~\ref{chap:mcp_background}), the security and scalability gaps of deploying MCP in a university environment are identified from the literature and from the operational context of \aaltoai ~\cite{aalto_ai_assistant}.
 
 \paragraph{Step 1 --- Problem identification and motivation.}
 The first step of DSRM defines the specific research problem and motivates why a solution is valuable \cite{peffers2007design}.
-The problem addressed in this thesis is the absence of a standardized, secure, and scalable framework for integrating MCP into a university GenAI production system. 
-This gap is established through the motivation for the research in Chapter \ref{chap:intro} and supported in Chapter \ref{chap:mcp_background} through the analysis of MCP challenges, including cybersecurity vulnerabilities, malicious server threats, and scaling limitations.
+The problem addressed in this thesis is the absence of a standardized, secure framework for integrating MCP into a university GenAI production system. 
+This gap is established through the motivation for the research in Chapter \ref{chap:intro} and is supported in Chapter \ref{chap:challenges} through the threat analysis of MCP.
+%In the \emph{problem identification and motivation} step (Chapter~\ref{chap:intro} and Chapter~\ref{chap:mcp_background}), the security of deploying MCP in a university environment are identified from the literature and from the operational context of \aaltoai ~\cite{aalto_ai_assistant}.
 
 \paragraph{Step 2 --- Definition of the objectives for a solution.}
 This chapter (Chapter~\ref{chap:requirements}) define the objectives of the solution from the problem definition.
-The operational context of Aalto AI Assistant (Section \ref{sec:aalto-ai-assistant}), the AI Tutor use case (Section \ref{sec:aitutor-use-cases}), and the threat landscape defined in \ref{chap:challenges} are used to derive the functional, security, and scalability requirements in Section \ref{sec:requirements} that \UniMCP must satisfy.
+The threats identified in Chapter \ref{chap:challenges} are used to derive the functional and security requirements in Section \ref{sec:requirements} that \UniMCP must satisfy.
 
 \paragraph{Step 3 --- Design and development.}
 The third step is to create the artifact \cite{peffers2007design}.
 Chapter~\ref{chap:design} presents the design of \UniMCP with its five guiding principles and its architecture.
-The design draws on established theory --- the threat
-model, the Zero Trust Architecture, and the gateway
-integration pattern --- to construct a solution that
-addresses the objectives defined in Step~2.
+%The design draws on established theory --- the threat model, the Zero Trust Architecture, and the gateway integration pattern --- to construct a solution that addresses the objectives defined in Step~2.
 
 \paragraph{Step 4 --- Demonstration.}
 The fourth step demonstrates the artifact in a concrete instance of the problem ~\cite{peffers2007design}.
-Chapter~\ref{chap:implementation} presents the AI Tutor proof-of-concept implementation, which instantiates \UniMCP within the real production environment of Aalto AI Assistant by implementing a transcript retrieval tool and a course search tool, both secured and routed through the \UniMCP gateway.
+Chapter~\ref{chap:implementation} presents the AI Tutor proof-of-concept implementation, which instantiates \UniMCP within the real production environment of Aalto AI Assistant (Section \ref{sec:aalto-ai-assistant}) by implementing AI Tutor as a working proof-of-concept  (Section \ref{sec:aitutor-use-cases}). 
+The case study context of Aalto AI Assistant and the implementation of AI Tutor operationalize Step~2 by grounding the abstract objectives of secure integration in a concrete organizational setting, rather than treating \UniMCP as an abstract framework.
 
 \paragraph{Step 5 --- Evaluation.}
-The fifth step observes and measures how well the artifact
-supports a solution to the problem, comparing results from
-Step~4 against the objectives defined in Step 2.
+The fifth step observes and measures how well the artifact supports a solution to the problem, comparing results from Step~4 against the objectives defined in Step 2.
 Chapter \ref{chap:evaluation} evaluates the AI Tutor implementation across the three dimensions corresponding to
-the thesis's research questions: secure integration and
-enforcement, scalability, and trustworthiness.
+the thesis's research questions.
 
 \paragraph{Step 6 --- Communication.}
 The last step communicates the problem, the artifact, its utility, and the rigor of its design to relevant
@@ -1269,123 +1281,166 @@ This thesis is the primary communication artifact for two audience groups:
 (1) Aalto University IT Services, for whom the thesis provides a documented and evaluated MCP integration framework for future university services; and
 (2) the academic research community,
 for whom \UniMCP contributes a validated framework and
-design guidelines for MCP deployment in organizational
-contexts.
+design guidelines for MCP deployment in educational organization's contexts.
 
-% ·····················
+% ------------------------------------------------------------
 \subsection{Requirement Derivation}
 \label{sec:rd-req-derivation}
-% ·····················
-The requirements for \UniMCP (detailed in Section \ref{sec:requirements}) are derived by
-tracing each of the three challenge layers identified in Chapter \ref{chap:challenges} to a
-concrete design obligation, rather than being defined independently of that
-analysis. 
-Table~\ref{tab:requirement-traceability} shows this traceability
-for the requirement categories introduced in Section~4.4.
- 
+% ------------------------------------------------------------
+
+The requirements for \UniMCP (detailed in Section \ref{sec:requirements}) are derived by tracing each of the three challenge layers identified in Chapter \ref{chap:challenges} to a concrete design obligation.
+Table~\ref{tab:requirement-traceability} shows this traceability for the requirement categories introduced in Section \ref{sec:requirements}. 
+
+Two additional inputs constrain this derivation beyond the literature review: (1) the operational context of Aalto AI Assistant, which fixes the available identity provider, the existing API management layer, and the existing test endpoints, % identity provider (Entra AD), the existing API management layer (3scale), and the existing test endpoints (MDM Persons API, MyCourses API)
+and (2) an interview with 20 randomly selected students from Aalto University (Section \ref{sec:aitutor-use-cases}), shows that a course recommendation tool is a highly appreciated student-facing use case and, therefore, the one against which the security requirements are validated.
+
 \begin{table}[h]
 \centering
 \caption{Traceability from challenge layer to requirement category}
 \label{tab:requirement-traceability}
+\renewcommand{\arraystretch}{1.3}
 \begin{tabular}{p{0.28\linewidth} p{0.30\linewidth} p{0.32\linewidth}}
-\toprule
-Challenges (Chap. \ref{chap:challenges}) & Requirement category & Example requirement \\
-\midrule
-Protocol-level (no mandatory auth, single-tenant session model) &
-Functional (FR1, FR2) & Gateway mediation of every tool call;
-identity-aware tool handlers \\
-Ecosystem-level (credential exposure, tool poisoning, immature
-enterprise tooling) & Security (SR1, SR2) & Internal-tool priority for
-identity-sensitive data; mandatory token on every request \\
-University-context (GDPR, data classification, SSO, multi-role access,
-audit accountability) & Functional \& security (FR1, FR3) & Consent
-enforcement before personal-data access; Azure AD--issued identity
-propagated to tool handlers \\
-Protocol-level (single-tenant session model) \& ecosystem-level (immature
-enterprise tooling) & Scalability & Support for concurrent multi-user
-sessions against one server instance \\
-\bottomrule
+    \toprule
+    Challenges (Chap. \ref{chap:challenges}) & Requirement category & Example requirement \\
+    \midrule
+    Protocol-level (no mandatory auth, no built-in tenant isolation) &
+    Functional (FR1, FR2) & Gateway mediation of every tool call;
+    identity-aware tool handlers. \\
+    \midrule
+    Ecosystem-level (credential exposure, tool poisoning, deficient server vetting) & Security (SR1, SR2, SR3) & Internal-tool priority for identity-sensitive data; mandatory token on every request; provenance requirements on institutional MCP servers.\\
+    \midrule
+    Ecosystem-level (prompt injection via tool outputs) & Security (SR6) & Untrusted-data boundary at the gateway; no tool response is interpreted as an instruction. \\
+    \midrule
+    University-context (GDPR, data classification, SSO, multi-role access, audit accountability) & Functional \& security (FR1, FR3, SR4, SR5) & Consent enforcement before personal-data access; Azure AD--issued identity
+    propagated to tool handlers; least-privilege data exposure; tamper-evident logging \\
+    \midrule
+    Protocol-level (no built-in tenant isolation) \& ecosystem-level (immature enterprise tooling) & Security (SR7) & Isolation of authorization state across concurrent user sessions against one server instance \\
+    \bottomrule
 \end{tabular}
 \end{table}
- 
-Two additional inputs constrain this derivation beyond the literature
-review: (1) the operational context of Aalto AI Assistant, which fixes the
-available identity provider (Azure AD), the existing API management layer
-(3scale), and the existing test endpoints (SISU, MDM Persons API), and (2)
-an interview with 20 randomly selected Aalto students (Section~4.3), which
-established that transcript-aware course recommendation is the highest-value
-student-facing use case and therefore the one against which the security
-and scalability requirements are validated.
- 
 
-
-
-% ·····················
+% ------------------------------------------------------------
 \subsection{Case Study Context: Aalto AI Assistant}
 \label{sec:aalto-ai-assistant}
-% ·····················
-Aalto University is a leading Finnish university that pioneers in AI adoption to institutional teaching and research.
-This can be seen by their active utilization of artificial intelligence into studies, research, and operations. 
-The most prominent application is \aaltoai \cite{aalto_ai_assistant}, a chat-based platform developed in-house by \aalto IT Services and deployed in May 2024. 
-Under the hood, it is powered by modern large language models, including OpenAI's GPT-5.4 and GPT-5.5 and Google's Gemini 2.5 Flash.
-It provides access to otherwise paid language models such as GPT 5.5 for all internal staff and students. 
-\aaltoai is used as the MCP host for the proof-of-concept.
-It is used as the main case study and provides a real production environment in which to design, implement, and evaluate the proposed MCP Integration Framework.
+% ------------------------------------------------------------
+As introduced in Chapter~\ref{chap:intro}, this thesis is carried out as a project at the IT Services of \aalto, a Finnish university that has been an early adopter of AI in teaching, research, and operations.
+Central to this case study is \aaltoai \cite{aalto_ai_assistant}, a chat-based platform developed by \aalto IT Services and deployed in May 2024 for all students and staff at \aalto.
+Under the hood, it is powered by modern large language models, including OpenAI's GPT-5.4 and GPT-5.5 and Google's Gemini 2.5 Flash, giving all internal staff and students access to language models that would otherwise require a paid subscription.
+Specifically, \aaltoai runs on Azure OpenAI services, which is Microsoft's enterprise version of OpenAI's large language models (GPT-5, GPT-4o, etc.), hosted inside Microsoft's Azure cloud rather than OpenAI's own infrastructure.
 
-% ·····················
-\subsection{Proof-of-Concept Use Case: AI Tutor}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/aaltoai.png}
+    \caption{Landing page of Aalto AI Assistant, an internal chat-based AI tool built by IT Services of \aalto on Azure OpenAI services \cite{aalto_ai_assistant}.}
+    \label{fig:aalto-ai-assistant}
+\end{figure}
+
+\aaltoai has been built and widely adopted primarily on grounds of safety and privacy: unlike services such as ChatGPT, it does not use user data to train language models, and user data is instead protected by user agreements and digital firewalls \cite{aalto_ai_assistant}.
+Consistent with this design, data classification policy of \aalto permits public, internal, and confidential data to be shared with the Aalto AI Assistant, while secret data remains prohibited \cite{aalto_ai_assistant}.
+
+This combination of production-grade deployment and an explicit, policy-backed data-handling compliance makes \aaltoai a suitable environment for the case study pursued in this thesis. Concretely, \aaltoai is used as the MCP host for the proof-of-concept implementation of the \UniMCP framework presented in Chapter~\ref{chap:implementation}, providing a real production environment in which to design, implement, and evaluate the proposed framework.
+
+% ------------------------------------------------------------
+\subsection{Implementation Context: AI Tutor}
 \label{sec:aitutor-use-cases}
-% ·····················
+% ------------------------------------------------------------
 
 % motivate by using the interview results
-The demand for AI assistant in study can be observed in an empirical interview with 20 randomly selected students at \aalto.
-\aitutor supports students in study planning by securely accessing the student’s transcript and suggesting relevant courses, taking into account student's study history and prompts.
+Study management at \aalto is centered on Sisu, a platform where students use for planning their studies, looking for courses, registering to courses, and tracking their study progress \cite{aaltosisu2026}.
+To assess whether an AI tool can reduce the friction students encounter with Sisu, a preliminary intercept study ($n=20$) is conducted on Aalto University campus to evaluate student interest in an AI-powered assistant to support study planning with Sisu.
+The study uses two questions: (1) whether participants currently use the Aalto AI Assistant; and (2) whether they will use it if it offers the proposed study-planning functionality in \aitutor, demonstrated via the UI mockup.
 
-% ·····················
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/aitutor_mockup.png}
+    \caption{UI mockup of \aitutor shown to participants during the intercept study. \aitutor is presented as a dedicated entry point in the \aaltoai's left navigation (top), which opens a study-planning view offering example queries such as course registration locations, semester schedule planning, and grade retrieval (bottom).}
+    \label{fig:aitutor_mockup}
+\end{figure}
+
+The result shows strong student interest in the proposed \aitutor tool across both user groups (Figure~\ref{fig:sisu_survey_findings}).
+Among the surveyed population, 75\% are already active \aaltoai users (15 students) who express immediate readiness for AI adoption. 
+Crucially, the demand extends even into the 25\% AI-hesitant or non-user cohort (5 students). Within this subset, students express a willingness to adopt an AI-based study planning assistant because manual course search and study planning with Sisu are difficult to navigate—indicating that administrative friction and systemic complexity are driving students to seek help from reliable AI assistant provided by the university. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/survey_edited.png}
+    \caption{Campus intercept survey findings ($n=20$) illustrating student interest in an study planning agent called \aitutor, embedded in \aaltoai. The result highlights that 75\% of the participants are \aaltoai users and favor immediate task integration, while 25\% of AI-hesitant students are motivated to adopt the platform due to high legacy system friction with Sisu, a study planning tool.}
+    \label{fig:sisu_survey_findings}
+\end{figure}
+
+This combination of high demand among AI users and openness among AI-hesitant students motivates \aitutor, an MCP-based agentic assistant integrated into \aaltoai that answers study-planning questions, retrieves course and credit data, and adheres to the requirements of the \UniMCP framework.
+Rather than building a new standalone tool from scratch, \aitutor can utilize the existing production system of \aaltoai and connects the Sisu APIs to \aaltoai.
+MCP is well suited to this: it allows IT teams at universities to rapidly connect existing enterprise tools and resources to AI applications, thereby accelerating the deployment of new agentic capabilities to support students throughout their academic journeys.
+Therefore, \aitutor serves as the concrete implementation vehicle through which this thesis designs, implements, and evaluates \UniMCP in a real institutional setting.
+
+However, scaling MCP within higher education demands robust governance framework integrations, including standardized authentication, authorization, auditing protocols, and stringent data privacy controls tailored to university ecosystems.
+This further motivates the necessity of such a standardized framework as \UniMCP for MCP incorporation in university contexts.
+
+% ------------------------------------------------------------
 \subsection{Requirements for \UniMCP}
 \label{sec:requirements}
+% ------------------------------------------------------------
+
+The requirements for \UniMCP are mainly derived from the architecture and challenges of MCP identified in Chapter \ref{chap:challenges}, the operational context of Aalto AI Assistant described in Section~\ref{sec:aalto-ai-assistant},  and the AI Tutor use case defined in Section~\ref{sec:aitutor-use-cases}.
+The requirements are organized into two categories: functional and security. Because this thesis
+narrows its scope to the security of an MCP integration (RQ1--RQ3), a property that was earlier framed
+as a separate scalability requirement --- isolating concurrent user sessions from one another --- is
+instead framed here as a security requirement (SR7), since a failure to isolate sessions correctly
+under concurrent load is fundamentally a confidentiality and authorization failure, not merely a
+performance one.
+
 % ·····················
-The requirements for \UniMCP are derived from three sources: 
-the architecture and challenges of MCP identified in Chapter \ref{chap:challenges}, 
-the operational context of Aalto AI Assistant described in Section~\ref{sec:aalto-ai-assistant}, 
-and the AI Tutor use case defined in Section~\ref{sec:aitutor-use-cases}.
-The requirements are organized into three categories: functional, security, and scalability.
-
 \subsubsection{Functional Requirements}
-
+% ·····················
 The functional requirements define what \UniMCP must take into account in order to support MCP integration into the IT production systems of a university.
  
 \textbf{FR1 --- University Identity Integration.}
 \UniMCP must authenticate users via the university's identity provider before any MCP tool is invoked.
-The authenticated identity must be propagated to individual MCP servers so that tool handlers can make identity-aware
-access decisions. 
+The authenticated identity must be propagated to individual MCP servers so that tool handlers can make identity-aware access decisions. 
 For example, the student study transcript must be only accessible to the transcript's owner.
 
 \textbf{FR2 --- Gateway Mediation.}
 All tool invocations from MCP host to MCP servers must be routed through a central gateway, i.e., an enforcement point for authentication, authorization, and logging.
-This follows the gateway architectural pattern identified in Section~\ref{sec:mcp-ecosystem} as the ecosystem's primary
-response to the multi-tenant MCP governance gap.
+This follows the gateway architectural pattern identified in Section \ref{sec:mcp-ecosystem} as the ecosystem's primary response to the multi-tenant MCP governance gap.
 
 \textbf{FR3 --- User Consent Enforcement.}
 Before any tool that accesses personal data is invoked, the gateway must ensure that the user has given their consent to that access during the current session, in line with the MCP specification's requirement that the host handles user authorization decisions \cite{mcpspec2026} and with GDPR's requirement for freely given, specific, and informed consent.
 
-
-
+% ·····················
 \subsubsection{Security Requirements}
-The security requirements are derived from the threat categories identified by Narajala et al. \cite{narajala2025enterprise} and the findings of Hasan et al. \cite{hasan2026mcp_security}. 
-
-% Follow the STRIDE Security Model?
-In addition, MAESTRO threat modeling framework is also consulted to form the security requirements in \UniMCP presented as follow. 
-
-\textbf{SR1 --- Internal Tool Priority}. 
-
+% ·····················
+The security requirements respond directly to the ecosystem-level threats catalogued in Section \ref{sec:ecosystem-challenges}: credential exposure, tool poisoning, and post-deployment mutation are not hypothetical risks but empirically observed failure modes of deployed MCP
+servers \cite{hasan2025mcp, wang2026mcptox, park2026attack}, and the threat categories identified by
+Narajala et al. \cite{narajala2025enterprise} are used to organize them.
+%In addition, MAESTRO threat modeling framework is also consulted to form the security requirements in \UniMCP presented as follow. 
 
 % How to avoid identity spoofing? 
-\textbf{SR2 --- Authentication}
-Every request to the MCP server must carry a valid Aalto identity token issued by Azure Active Directory.
-% How to prevent users from tampering with the models/API or data in Aalto AI Assistant?
+\textbf{SR1 --- Authentication}
+\label{sec: SR1}
+Every request that reaches an MCP server, directly or through the gateway, must carry a valid credential. 
+A request without a valid, unexpired token must be rejected before any tool invocation.
+This requirement directly closes the protocol-level gap identified in Section~\ref{sec:proto-limits}: the MCP specification recommends, but does not mandate, authentication for remote
+servers~\cite{mcpspec2026}, so a compliant server can legally omit it. \UniMCP treats authentication as
+non-optional rather than leaving it to individual server implementations.
 
-\subsubsection{Scalability Requirements}
+\textbf{SR2 ---  No Sensitive Data Exposure to LLM.}
+\label{sec: SR2}
+Any operation that involves university user's sensitive data or identity must not be an MCP tool, because a tool enable models to interact with external systems, such as querying databases, calling APIs. 
+They must be implemented as a internal service call that executes deterministically outside the LLM's tool-selection loop, rather than as an MCP tool the model chooses whether and when to invoke. 
+These operations are, for example, mapping an authenticated, logged-in user to a student number or accessing a student's transcript.
+Only operations on non-identity-bound, lower-sensitivity data (e.g., course catalogue search or research publication search) should be exposed to the LLM as an MCP tool.
+This requirement follows directly from the tool poisoning findings of Section~\ref{sec:ecosystem-challenges}, because a poisoned or compromised MCP tool can influence \emph{whether} and
+\emph{how} the model decides to call it~\cite{wang2026mcptox}. Keeping identity resolution and
+access-control decisions on the internal, non-LLM-mediated code path means that even a successful
+prompt injection or tool-poisoning attack against the course-recommendation tool cannot, by itself,
+grant access to another student's data, because that decision was never delegated to the model in
+the first place.
+
+
+% How to prevent users from tampering with the models/API or data in Aalto AI Assistant?
+\textbf{SR3 --- Internally Developed MCP Server.} 
+
+%\subsubsection{Scalability Requirements}
 
 \clearpage
 % ============================================================
@@ -1395,49 +1450,53 @@ Every request to the MCP server must carry a valid Aalto identity token issued b
 This chapter focuses on the design of \UniMCP, the proposed integration framework for connecting a university GenAI assistant to institutional tools and data sources using MCP. 
 
 \subsection{Purposes of \UniMCP}
-\UniMCP aims to provide a framework that answers two major questions:
-\begin{itemize}
-    \item Secure integration: How can MCP be integrated into a university GenAI production system without exposing sensitive data or allowing unauthorized tool use?
-    \item Scalability: How can new university tools be added without redesigning the AI assistant pipeline?
-\end{itemize}
+\UniMCP aims to provide a framework that answers these major questions:
+
 
 \subsection{Principles of \UniMCP}
-The design of \UniMCP is guided by five principles that translate the requirements of Chapter~\ref{chap:requirements} into architectural decisions.
-The framework follows these principles:
-
-\textbf{Principle 1 --- University-Identity-First.}
-Every MCP request must be associated with an authenticated university user.
-
-\textbf{Least privilege.}
-AI Tutor should access only the data required for the current task.
-
-\textbf{User-scoped authorization.}
-A student should only be able to retrieve their own transcript.
-
-\textbf{Tool approval.}
-Only approved MCP tools should be available in the AI assistant application.
-
-Data minimization.
-Sensitive transcript data should be summarized or filtered before being passed to the model.
-
-Auditability.
-Tool calls should be logged for security review and debugging.
-
-Prompt injection resistance.
-External data should be treated as untrusted and should not be allowed to override system instructions.
-
+\label{sec:principles}
+The design of \UniMCP is guided by seven principles that translate the requirements of Chapter~\ref{chap:requirements} into concrete architectural decisions. 
+Each principle names the requirement(s) it operationalizes so that the traceability established in Section \ref{sec:rd-req-derivation} continues into the design itself.
+ 
+\textbf{P1 --- University-Identity-First (FR1, SR2).}
+Every MCP request must be associated with an authenticated university user before any tool executes.
+Identity is established once, at the boundary between the MCP host and the university's identity authentication provider, and is propagated through every subsequent internal call.
+ 
+\textbf{P2 --- Least Privilege (SR4).}
+An MCP component should only receive the  bare minimum data it needs to complete its specific task, and nothing more. 
+For instance, in an MCP tool that recommends courses tailored to a certain student, the LLM should only receive relevant course information and necessary student's study history, rather than the attendance list of courses or the student's identity records.
+ 
+\textbf{P3 --- User-Scoped Authorization (FR1).}
+Authorization decisions are always scoped to the requesting user's own data: a student can retrieve
+only their own transcript, never another student's, and this scoping is enforced on the internal
+service path rather than left to the LLM's judgement.
+ 
+\textbf{P4 --- Gateway-Mediated Tool Approval (FR2, ScR1).}
+All tool invocations are routed through a single enforcement point --- the gateway --- which maintains the catalogue of approved tools available to the AI assistant. 
+A tool that is not registered at the gateway is not reachable by the agentic pipeline, regardless of what the remote MCP server exposes. 
+This is also what makes tool extensibility (ScR1) possible without redesigning the pipeline: adding a tool means registering it at the gateway and at the MCP server, not modifying the
+orchestration logic that calls the gateway.
+ 
+\textbf{P5 --- Internal-Path Priority for Identity-Sensitive Operations (SR1).}
+Operations that resolve or depend on institutional identity are implemented as internal service
+calls on a deterministic code path, outside the set of tools the LLM is allowed to select. Only
+lower-sensitivity, catalogue-style operations are exposed to the LLM as MCP tools. This is the
+architectural expression of SR1 and is detailed in Section~\ref{sec:architecture}.
+ 
+\textbf{P6 --- Auditability (institutional audit accountability, Section~\ref{sec:university-context}).}
+Every tool call and every internal identity-resolution call is logged with the requesting user's
+identity, the resource accessed, and a timestamp, so that access to student data can be reconstructed
+for security review or institutional compliance reporting.
+ 
+\textbf{P7 --- Untrusted-Data Boundary (prompt-injection resistance, ecosystem-level challenges,
+Section~\ref{sec:ecosystem-challenges}).}
+Any content that originates outside the gateway's own system instructions --- tool responses,
+retrieved documents, external API payloads --- is treated as untrusted data and is never allowed to
+be interpreted as a system-level instruction, regardless of its apparent formatting.
 
 
 \subsection{High-Level Architecture}
-\label{sec:architecture}
-
-\subsubsection{MCP host}
-
-\subsubsection{MCP server}
-
-\subsubsection{MCP deployment pattern}
-Follow the suitable deployment pattern based on the univeristy's existing architecture, operational resources, and risk tolerance.
-The pattern can be API gateway-centric integration or containerized microservices. 
+ 
 
 \clearpage
 % ============================================================
@@ -1445,8 +1504,9 @@ The pattern can be API gateway-centric integration or containerized microservice
 \label{chap:implementation}
 % ============================================================
 
-As a proof-of-concept to implement and validate the \UniMCP framework in a real-life problem, AI Tutor, which is embedded in Aalto AI Assistant, is developed as a tailored AI tutor for students who are studying towards a degree at Aalto University.
-Essentially, AI Tutor securely accesses the study transcript of the student user and suggest courses based on the student's transcript, helping students plan their study.
+As a proof-of-concept to implement and validate the \UniMCP framework in a real-life organizational problem, \aitutor is developed as a tailored AI tutor for students who are studying towards a degree at Aalto University.
+\aitutor is embedded in Aalto AI Assistant, utilizing an existing production environment as an MCP host.
+Essentially, AI Tutor securely accesses the study transcript of the student user and suggests courses based on the student's transcript, helping students plan their study.
 
 \subsection{Implementation Context}
 This thesis work is carried out as a work project at Aalto University IT Services and Aalto AI Assistant serves as the real production environment for the case study.
@@ -1473,10 +1533,71 @@ FastMCP is chosen to be the framework for the implementation of \aitutor.
 \subsection{MCP Tools Implemented}
 Course search tool.
 
-\subsection{Security Controls Implemented}
-In teaching operations inside universities, sensitive personal data and critical workflows are heavily involved. 
+\subsection{Architecture Implementation}
+\label{sec:architecture}
 
-\subsection{Implementation Limitations}
+Figure~\ref{fig:ai_tutor_architecture} shows the high-level architecture that results from applying
+Principles P1--P7 to the operational context of \aaltoai. The design keeps the existing, unmodified
+Aalto AI Assistant front end (browser, reverse proxy, FastAPI entry point) and adds the \UniMCP
+components --- the AI Tutor router, the agentic pipeline, and the remote MCP server --- behind it,
+so that the integration is additive rather than a redesign of the production system already serving
+Aalto's users.
+ 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.98\textwidth]{figures/ai_tutor_architecture.png}
+    \caption{High-level architecture of the \UniMCP-based AI Tutor integration into Aalto AI
+    Assistant. The AI Tutor router acts as the gateway (P4) that mediates every tool call; identity-sensitive operations (student-number resolution, transcript retrieval) are handled by the AI Tutor
+    Service and User Service on an internal path (P5), while the LLM-facing MCPAgentPipeline only
+    reaches the remote MCP server for the lower-sensitivity course-search capability.}
+    \label{fig:ai_tutor_architecture}
+\end{figure}
+
+\subsubsection{MCP host}
+The MCP host is the AI application backend: the existing FastAPI application (\texttt{main.py}) delegates
+student-facing requests to the \textbf{AI Tutor router} (\texttt{/api/v1/student/query}), which embeds
+the \textbf{MCPAgentPipeline}, an agentic pipeline built with Haystack. The pipeline itself plays the
+role of the MCP \emph{client}: its \texttt{ToolInvoker} component opens and manages the connection to
+the remote MCP server and issues tool calls on behalf of the current user's authenticated session.
+Placing the MCP client inside the pipeline that Aalto AI Assistant already uses for chat completion
+(rather than introducing a new, separate host application) follows the least-disruption rationale
+behind P4: the production chat pipeline, reverse proxy, and front end are reused unchanged, and only
+the AI Tutor router and the pipeline's tool-calling branch are new.
+ 
+\subsubsection{MCP server}
+The MCP server is a dedicated, remotely deployed \textbf{AI Tutor MCP server} that exposes the
+course-search capability as an MCP tool and connects to the SISU Course APIs on the university's
+behalf. Two design decisions shape this component. First, only the course-search capability is
+exposed as an MCP tool; the transcript-retrieval and student-identity-resolution capabilities are
+deliberately \emph{not} exposed through MCP at all, but implemented as internal calls from the AI
+Tutor Service to the SISU transcript endpoint and to the User Service (P5, SR1) --- this is the
+concrete architectural realization of internal-tool priority. Second, the server authenticates its
+outbound calls to the SISU Course APIs using a service-level token issued by the university's API
+management platform (3scale), so that the remote MCP server itself never handles end-user
+credentials directly; it operates within a trust boundary already established by the university's
+existing API gateway infrastructure.
+In \aitutor, a request sequence begins when a user sends a prompt in the chat with \aitutor; each turn of the conversation issues one or more self-contained requests that carry the transcript-retrieval and course-recommendation tool calls described in Section~\ref{sec:aitutor-use-cases}; and no explicit termination step is required when the user closes the conversation, since no protocol-level session was opened in the first place.
+
+Section~\ref{sec:implementation-limitations} discusses a consequence of this shift for the proof of
+concept, which is implemented and evaluated against a legacy, session-based revision of MCP server (Chapter~\ref{chap:implementation}).
+
+\subsubsection{MCP deployment pattern}
+\UniMCP follows an \emph{API-gateway-centric} deployment pattern rather than a containerized,
+per-tool microservice pattern, because Aalto already operates a central API management layer
+(3scale) and a central identity provider (Azure AD); routing every MCP tool call through the existing AI Tutor router and the existing API management layer reuses this infrastructure instead of
+duplicating governance logic at every tool. Within this pattern, the MCP server itself is deployed
+remotely (on a shared RHEL server) rather than locally alongside each host process, so that a single
+server instance can serve multiple concurrent user sessions over Streamable HTTP (ScR2) --- the
+local, STDIO-based alternative would instead require one server process per session, which does not
+scale to a shared, multi-user university deployment (Section~\ref{sec:ecosystem-challenges}). The
+choice of deployment pattern is not fixed for every future \UniMCP integration: Section~\ref{sec:mcp-ecosystem} notes that the suitable pattern depends on the university's existing
+architecture, operational resources, and risk tolerance, and a smaller-scale or higher-risk
+integration might instead favor isolated, containerized MCP servers per tool at the cost of
+duplicated governance logic.
+
+\subsection{Security Controls Implemented}
+An Aalto identity token issued by Azure Active Directory for the end-user session, and a service-level token issued by the university's API management layer for the service-to-service call
+that follows from it. 
 
 \clearpage
 % ============================================================
@@ -1498,21 +1619,34 @@ In teaching operations inside universities, sensitive personal data and critical
 \subsection{Secure Integration and Enforcement}
 The problem with Haystack is the processing of Image Message type.
 When given a URL in image URL parameter, haystack will try to retrieve that data, meaning the calls for this come from the backend and can potentially expose internal data to models. 
-\subsection{Scalability}
 
-\subsection{Trustworthiness}
+\subsection{Scalability}
+whether the resulting system can serve a growing user population, without redesigning the underlying agentic pipeline. 
+
+\subsection{Reliability}
+
+\subsection{Implementation Limitation}
+\label{sec:implementation-limitations}
+evaluate the trustworthiness of an MCP agent operating within a university's GenAI system?
 
 \clearpage
+% ============================================================
 \section{Conclusion}
-\label{sec:conclusion}
+\label{chap:conclusion}
+% ============================================================
+\subsection{Limitation}
+
 %This is where you tie up any loose ends. Tell your reader briefly and clearly what you have done, what you have discovered, and the value of your discovery in the context of similar work done earlier. Draw clear conclusions regarding the research problem, sub-problems or hypotheses. You also discuss future lines of study and new questions your study might have posed.
 
+The growing student demand for accessible AI assistants to help with study planning and administrative tasks further accelerates the institutional adoption of AI. 
 % Why it is relevant to GenAI production systems.
 Since its introduction in 2024, MCP has become a new standard that redefines how large language models interact with external tools and resources, as it helps facilitate robust extension of a GenAI system's capabilities without modifying its underlying agentic pipeline.
 Therefore, software developers can reduce development time and complexity when building an AI application system and connecting the AI models to external resources.
 However, as a consequence, exposing large language models to the external world means that MCP brings new security and ecosystem challenges.
-The lack of established frameworks for building secure, scalable and trustworthy MCP deployments in university production environments represents a significant research gap that this thesis aims to address.
+In operations inside universities, sensitive personal data and critical workflows are heavily involved. 
+The lack of established frameworks for building secure, scalable AI system in university production environments represents a significant research gap that this thesis aims to address.
 The thesis follows the six-step process of the design science research methodology to design \UniMCP.
+
 
 To verify the proposed \UniMCP framework, the case study of Aalto AI Assistant, a chat-based GenAI application developed by Aalto University IT Services in Finland, is conducted.
 As a proof of concept for implementing and validating the \UniMCP for university contexts, this thesis develops AI Tutor, a tailored student-facing assistant within Aalto AI Assistant. 
@@ -1522,8 +1656,9 @@ As a proof of concept for implementing and validating the \UniMCP for university
 In this thesis work, AI tools are used as support during the programming and writing processes.
 Codex is used for studying the code base of \aaltoai, implementing \aitutor, debugging, and testing. 
 
-During the writing process, AI is used to check typing and grammar mistakes and unclear or incoherent sections.
-All suggestions were reviewed, and all final edits were made manually. 
+During the writing process, AI is used to check for typing and grammar mistakes, as well as unclear or incohesive flow.
+AI is also used to generate the bib citation of some references. 
+All suggestions made by AI are reviewed, and all final edits are made manually by the author. 
 AI is also used to help format tables seen in this work and suggest suitable layouts for them.
 
 \clearpage

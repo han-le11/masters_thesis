@@ -1,16 +1,30 @@
+@IEEEtranBSTCTL{IEEEexample:BSTcontrol,
+    CTLdash_repeated_names = "no"
+}
+%% ----------------------------------------
 %% MCP official document and specification
 %% ----------------------------------------
 
 @misc{anthropic_mcp_intro,
-  author       = {{Anthropic}},
+  author       = {{Model Context Protocol}},
   title        = {{What is the Model Context Protocol (MCP)?}},
-  howpublished = {Official MCP Documentation},
-  year         = {2024},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
   note         = {[Online]. Available:
                   \url{https://modelcontextprotocol.io/docs/getting-started/intro}.
                   (Accessed: 9 Jun 2026)},
 }
- 
+
+@misc{mcpspec2026,
+  author       = {{Model Context Protocol}},
+  title        = {{Architecture Overview --- Model Context Protocol}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/learn/architecture}.
+                  (Accessed: 22 Jul 2026)},
+}
+
 @misc{mcp_architecture,
   author       = {{Model Context Protocol}},
   title        = {{Model Context Protocol Architecture}},
@@ -20,37 +34,151 @@
                   \url{https://modelcontextprotocol.info/specification/draft/architecture/}.
                   (Accessed: 27 Jul 2026)},
 }
- 
-@misc{mcpspec2026,
-  author       = {{Anthropic}},
-  title        = {{Architecture Overview --- Model Context Protocol}},
+
+@misc{mcp_tools_2026,
+  author       = {{Model Context Protocol}},
+  title        = {{Server Features: Tools}},
   howpublished = {Model Context Protocol Documentation},
+  version      = {2026-07-28},
   year         = {2026},
+  month        = jul,
   note         = {[Online]. Available:
-                  \url{https://modelcontextprotocol.io/docs/learn/architecture}.
-                  (Accessed: 22 Jul 2026)},
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/server/tools}.
+                  (Accessed: Aug. 11, 2026)}
 }
- 
-@misc{mcpclient2026,
-  author       = {{Anthropic}},
-  title        = {{Understanding MCP clients}},
+
+@misc{mcpspec2026resources,
+author       = {{Model Context Protocol}},
+  title        = {{Server Features: Resources}},
   howpublished = {Model Context Protocol Documentation},
+  version      = {2026-07-28},
+  month        = jul,
   year         = {2026},
   note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/server/resources}.
+                  (Accessed: 11 Aug, 2026)}
+}
+
+@misc{mcp_prompts_2026,
+  author       = {{Model Context Protocol}},
+  title        = {{Server Features: Prompts}},
+  howpublished = {Model Context Protocol Documentation},
+  version      = {2026-07-28},
+  year         = {2026},
+  month        = jul,
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/server/prompts}.
+                  (Accessed: Aug. 11, 2026)}
+}
+
+@misc{mcpclient2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Understanding MCP clients}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
                   \url{https://modelcontextprotocol.io/docs/2026-07-28/learn/client-concepts}.
                   (Accessed: 27 Jul 2026)},
 }
- 
-@misc{mcp_authorization_2025,
-  author       = {{Anthropic}},
-  title        = {{Model Context Protocol Authorization}},
-  howpublished = {Model Context Protocol Documentation},
-  year         = {2025},
-  note         = {[Online]. Available:
-                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization}.
-                  (Accessed: 3 Aug 2026)},
+
+@misc{mcpserver2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Understanding MCP servers}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts}.
+                  (Accessed: 11 Aug 2026)},
 }
- 
+
+@misc{mcp_authorization_2025,
+author       = {{Model Context Protocol}},
+title        = {{Model Context Protocol Authorization}},
+howpublished = {Model Context Protocol Documentation},
+year         = {2025},
+note         = {[Online]. Available:
+              \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization}.
+              (Accessed: 3 Aug 2026)},
+}
+
+@misc{mcpchangelog2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Key Changes --- Model Context Protocol, Specification Version 2026-07-28}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/changelog}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{mcpversioning2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Versioning and Compatibility --- Model Context Protocol, Specification Version 2026-07-28}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{mcplocalservers2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Connect to local MCP servers}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/2026-07-28/develop/connect-local-servers}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{mcpfilesystem2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Filesystem MCP Server --- Model Context Protocol Reference Implementations}},
+    howpublished = {GitHub Repository},
+    year         = {2026},
+    note         = {[Online]. Available:\url{https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem}.
+    (Accessed: 12 Aug 2026)},
+}
+
+@misc{owasp_mcp_security_2026,
+  author       = {{OWASP}},
+  title        = {{MCP Security Cheat Sheet}},
+  howpublished = {OWASP Cheat Sheet Series},
+  year         = {2026},
+  note         = {[Online]. Available: \url{https://cheatsheetseries.owasp.org/cheatsheets/MCP_Security_Cheat_Sheet.html}. (Accessed: 12 Aug 2026)},
+}
+
+@misc{mcpremoteservers2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Connect to remote MCP Servers}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/docs/2026-07-28/develop/connect-remote-servers}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{soriaparra2026spec,
+  author       = {Soria Parra, David and Delimarsky, Den},
+  title        = {{The 2026-07-28 Specification}},
+  howpublished = {Model Context Protocol Blog},
+  year         = {2026},
+  month        = {Jul},
+  note         = {[Online]. Available:
+                  \url{https://blog.modelcontextprotocol.io/posts/2026-07-28/}.
+                  (Accessed: 10 Aug 2026)},
+}
+
+@misc{mcp_revision_blog,
+    author       = {Soria Parra, David and Delimarsky, Den},
+    title        = {{The 2026-07-28 MCP Specification Release Candidate}},
+    howpublished = {Model Context Protocol Blog},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://blog.modelcontextprotocol.io/posts/2026-07-28-release-candidate/}.
+                  (Accessed: 11 Aug 2026)},
+}
+
 @misc{jsonrpc2020,
   author       = {{JSON-RPC Working Group}},
   title        = {{JSON-RPC 2.0 Specification}},
@@ -61,10 +189,62 @@
                   (Accessed: 27 Jul 2026)},
 }
 
+@article{birrell1984implementing,
+  author  = {Birrell, Andrew D. and Nelson, Bruce Jay},
+  title   = {{Implementing Remote Procedure Calls}},
+  journal = {ACM Transactions on Computer Systems},
+  volume  = {2},
+  number  = {1},
+  pages   = {39--59},
+  year    = {1984},
+  month   = {Feb},
+  doi     = {10.1145/2080.357392}
+}
+
+@misc{mcpspec2025,
+  author       = {{Model Context Protocol}},
+  title        = {{Model Context Protocol Lifecycle (Revision 2025-11-25)}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2025},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2025-03-26/basic/lifecycle}.
+                  (Accessed: 17 Aug 2026)},
+}
+
+@misc{mcpspec_mrtr,
+  author       = {{Model Context Protocol}},
+  title        = {{Multi Round-Trip Requests --- Model Context Protocol}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr}.
+                  (Accessed: 25 Aug 2026)},
+}
+
+@misc{mcp_streamable_http,
+  author       = {{Model Context Protocol}},
+  title        = {{Streamable HTTP}},
+  howpublished = {Model Context Protocol Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http}.
+                  (Accessed: 25 Aug 2026)},
+}
+
+
 %% --------------------------------------------------
 %% MCP ecosystem: Server implementations & registries
 %% --------------------------------------------------
- 
+@misc{google_mcp2026,
+  author       = {{Google}},
+  title        = {{Supported Products --- Google Cloud MCP Servers}},
+  howpublished = {Google Cloud Documentation},
+  year         = {2026},
+  note         = {[Online]. Available:
+                  \url{https://docs.cloud.google.com/mcp/supported-products}.
+                  (Accessed: 17 Aug 2026)},
+}
+
 @misc{google_calendar_mcp,
   author       = {{Google}},
   title        = {{Configure the Calendar MCP Server}},
@@ -87,11 +267,11 @@
  
 @misc{figma-mcp,
   author       = {{Figma}},
-  title        = {{Design context everywhere you build}},
-  howpublished = {Figma Blog},
+  title        = {{Figma MCP Server Introduction}},
+  howpublished = {Figma Developers},
   year         = {2026},
   note         = {[Online]. Available:
-                  \url{https://www.figma.com/blog/design-context-everywhere-you-build/}.
+                  \url{https://developers.figma.com/docs/figma-mcp-server/}.
                   (Accessed: 16 Jun 2026)},
 }
  
@@ -105,6 +285,34 @@
                   (Accessed: 16 Jun 2026)},
 }
 
+@misc{mcpexamples2026,
+    author       = {{Model Context Protocol}},
+    title        = {{Example Servers}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/examples}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{mcpstdio2026,
+    author       = {{Model Context Protocol}},
+    title        = {{STDIO --- Model Context Protocol, Specification Version 2026-07-28}},
+    howpublished = {Model Context Protocol Documentation},
+    year         = {2026},
+    note         = {[Online]. Available:
+                  \url{https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio}.
+                  (Accessed: 11 Aug 2026)},
+}
+
+@misc{fastmcp2026,
+  author       = {{PrefectHQ}},
+  title        = {{Welcome to FastMCP 2.0!}},
+  howpublished = {FastMCP Documentation},
+  year         = {2026},
+  note         = {[Online]. Available: \url{https://gofastmcp.com/}. (Accessed: 29 Aug 2026)},
+}
+
 @misc{fastmcp_openapi2026,
   author       = {{FastMCP}},
   title        = {{OpenAPI Integration --- FastMCP}},
@@ -114,6 +322,39 @@
                   \url{https://gofastmcp.com/integrations/openapi}.
                   (Accessed: 6 Aug 2026)},
 }
+
+@misc{microsoft_mcp_governance2026,
+  author       = {Janardhanan, Priya},
+  title        = {{Protecting AI Conversations at Microsoft with Model Context Protocol Security and Governance}},
+  howpublished = {Microsoft Inside Track Blog},
+  year         = {2026},
+  note         = {[Online]. Available: \url{https://www.microsoft.com/insidetrack/blog/protecting-ai-conversations-at-microsoft-with-model-context-protocol-security-and-governance/}. (Accessed: 1 Sep 2026)},
+}
+
+@misc{google_mcp_scaling2026,
+  author       = {{Van Gent}, Kurtis and Blount, Alan},
+  title        = {{Scaling AI Agent Infrastructure with the MCP Stateless Updates}},
+  howpublished = {Google Developers Blog},
+  year         = {2026},
+  note         = {[Online]. Available: \url{https://developers.googleblog.com/scaling-ai-agent-infrastructure-with-the-mcp-stateless-updates/}. (Accessed: 1 Sep 2026)},
+}
+
+@misc{bloomberg_mcp2026,
+  author       = {{Bloomberg LP}},
+  title        = {{Closing the Agentic AI Productionization Gap: Bloomberg Embraces MCP}},
+  howpublished = {Bloomberg Company Blog},
+  year         = {2026},
+  note         = {[Online]. Available: \url{https://www.bloomberg.com/company/stories/closing-the-agentic-ai-productionization-gap-bloomberg-embraces-mcp/}. (Accessed: 1 Sep 2026)},
+}
+
+@misc{mcpregistry2026,
+  author       = {{Model Context Protocol Contributors}},
+  title        = {Official {MCP} Registry: Discover {Model Context Protocol} Servers},
+  year         = {2026},
+  howpublished = {\url{https://registry.modelcontextprotocol.io/}},
+  note         = {Accessed: 2026-09-01}
+}
+
 
 %% -------------------------------
 %% MCP surveys & landscape studies
@@ -144,7 +385,25 @@
 %% -----------------------
 %% MCP security 
 %% -----------------------
- 
+
+@misc{hasan2026mcp,
+  author       = {Hasan, Mohammed Mehedi and Li, Hao and Rajbahadur, Gopi Krishnan and Adams, Bram and Hassan, Ahmed E.},
+  title        = {{Model Context Protocol (MCP)} Tool Descriptions Are Smelly! Towards Improving {AI} Agent Efficiency with Augmented {MCP} Tool Descriptions},
+  year         = {2026},
+  eprint       = {2602.14878},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.SE},
+  url          = {https://arxiv.org/abs/2602.14878}
+}
+
+@article{radosevich2025mcp,
+  author    = {Radosevich, Brandon and Halloran, John},
+  journal   = {arXiv preprint arXiv:2504.03767},
+  title     = {{{MCP}} Safety Audit: {{LLMs}} with the Model Context Protocol Allow Major Security Exploits},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2504.03767}
+}
+
 %% Preprint, not peer reviewed at time of citation.
 @misc{yan2025mcpmisuse,
   author        = {Yan, Biwei and Zhang, Yue and Xu, Minghui and Wu, Hao and Zhang, Yechao and Li, Kun and Zhang, Guoming and Cheng, Xiuzhen},
@@ -155,7 +414,40 @@
   archivePrefix = {arXiv},
   primaryClass  = {cs.CR}
 }
- 
+
+@misc{bhatt2025etdi,
+  author        = {Bhatt, Manish and Narajala, Vineeth Sai and Habler, Idan},
+  title         = {{ETDI}: Mitigating Tool Squatting and Rug Pull Attacks in Model Context Protocol ({MCP}) by using {OAuth}-Enhanced Tool Definitions and Policy-Based Access Control},
+  year          = {2025},
+  eprint        = {2506.01333},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  url           = {https://arxiv.org/abs/2506.01333}
+}
+
+@online{postmark2025incident,
+  author       = {{Postmark}},
+  title        = {Information Regarding Malicious "postmark-mcp" Package},
+  year         = {2025},
+  month        = {September},
+  day          = {25},
+  url          = {https://postmarkapp.com/blog/information-regarding-malicious-postmark-mcp-package},
+  note         = {Accessed: 2026-09-01},
+  publisher    = {ActiveCampaign, LLC}
+}
+
+@Article{park2026attacksurface,
+    AUTHOR = {Park, Jinwoo and Kim, Geonhee and Lee, Hyeokjae and Park, Jeman},
+    TITLE = {{Beyond Tool Poisoning: Attack Surfaces of Malicious Remote MCP Servers Across LLM Platforms}},
+    JOURNAL = {Electronics},
+    VOLUME = {15},
+    YEAR = {2026},
+    NUMBER = {10},
+    ARTICLE-NUMBER = {2214},
+    URL = {https://www.mdpi.com/2079-9292/15/10/2214},
+    ISSN = {2079-9292},
+}
+
 %% Preprint, not peer reviewed at time of citation.
 @misc{narajala2025enterprise,
   author        = {Narajala, Vineeth Sai and Habler, Idan},
@@ -225,7 +517,24 @@
   archivePrefix = {arXiv},
   primaryClass  = {cs.HC}
 }
- 
+
+@misc{gdpr2016,
+  author       = {{European Parliament and Council of the European Union}},
+  title        = {{Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data (General Data Protection Regulation)}},
+  howpublished = {Official Journal of the European Union, L 119},
+  year         = {2016},
+  note         = {[Online]. Available: \url{https://eur-lex.europa.eu/eli/reg/2016/679/oj}. (Accessed: 1 Sep 2026)},
+}
+
+@misc{aalto_classification_info,
+  author       = {{Aalto University}},
+  title        = {{Classification of Information}},
+  institution  = {{Aalto University}},
+  month        = {Sep},
+  year         = {2026},
+  note         = {Internal document},
+}
+
 %% --------------------
 %% Research methodology
 %% --------------------
@@ -255,7 +564,7 @@
 }
 
 %% -----------------------------------
-%% Aalto University AI context
+%% Aalto University context
 %% -----------------------------------
 
 @misc{aalto_ai_assistant,
@@ -272,4 +581,12 @@
   howpublished = {\url{https://www.aalto.fi/en/services/local-llm-gateway}},
   note         = {Updated: 10 Feb.\ 2026, Accessed: 29 Jul.\ 2026},
   year         = {2026}
+}
+
+@misc{aaltosisu2026,
+  author       = {{Aalto University}},
+  title        = {Sisu},
+  howpublished = {\url{https://www.aalto.fi/en/services/sisu}},
+  year         = {2026},
+  note         = {Accessed: Sep. 4, 2026}
 }
